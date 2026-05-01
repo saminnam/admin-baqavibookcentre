@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RiMenuFoldLine } from "react-icons/ri";
 import { FaRegBell } from "react-icons/fa";
 import { CgLogOut } from "react-icons/cg";
+import { useNotification } from "../context/NotificationContext";
 
 const MainContent = ({
   sidebarExpanded,
@@ -11,8 +12,10 @@ const MainContent = ({
   children,
 }) => {
   const navigate = useNavigate();
+  const { hasNotifications } = useNotification();
   const [toggleProfile, setToggleProfile] = useState(false);
   const profileRef = useRef(null); // ref for the whole dropdown container
+  const [userData, setUserData] = useState(null);
 
   // ✅ Close profile menu when clicking outside
   useEffect(() => {
@@ -26,6 +29,14 @@ const MainContent = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
+
+  // Load user data from localStorage
+  useEffect(() => {
+    const user = localStorage.getItem("adminUser");
+    if (user) {
+      setUserData(JSON.parse(user));
+    }
   }, []);
 
   const handleLogout = () => {
@@ -71,12 +82,15 @@ const MainContent = ({
             />
           </button>
           <h4 className="text-lg md:block hidden font-semibold text-gray-900">
-            {getGreeting()}, Team
+            {getGreeting()}, {userData?.name || "User"}
           </h4>
         </div>
         <div className="flex items-center gap-4">
-          <div className="border p-2 text-gray-500 text-xl border-gray-300 rounded">
+          <div className="relative border p-2 text-gray-500 text-xl border-gray-300 rounded cursor-pointer hover:bg-gray-100 transition-colors">
             <FaRegBell />
+            {hasNotifications && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+            )}
           </div>
           <div className="relative" ref={profileRef}>
             <button
@@ -104,8 +118,8 @@ const MainContent = ({
                     />
                   </div>
                   <div>
-                    <h5 className="font-semibold">Web Developer</h5>
-                    <p className="text-sm text-gray-500">Admin</p>
+                    <h5 className="font-semibold">{userData?.name || "User"}</h5>
+                    <p className="text-sm text-gray-500 capitalize">{userData?.role || "Admin"}</p>
                   </div>
                 </div>
                 <button

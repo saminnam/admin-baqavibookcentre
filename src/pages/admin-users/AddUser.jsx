@@ -1,16 +1,32 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { UserPlus, Shield, Mail, Phone, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { UserPlus, Shield, Mail, Phone, Lock, Eye, EyeOff, Loader2, CheckSquare, Square } from "lucide-react";
 
 const AddUser = ({ onUserAdded }) => {
+  const availablePermissions = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "user-list", label: "User Management" },
+    { id: "add-user", label: "Add User" },
+    { id: "product-list", label: "Product List" },
+    { id: "add-product", label: "Add Product" },
+    { id: "order-list", label: "Order Management" },
+    { id: "manage-sellers", label: "Seller Management" },
+    { id: "manage-enquires", label: "Enquiry Management" },
+    { id: "blog-list", label: "Blog Management" },
+    { id: "add-blog", label: "Add Blog" },
+    { id: "website-users", label: "Website Users" },
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     password: "",
     role: "admin",
-    status: "active"
+    status: "active",
+    permissions: []
   });
+  const [selectAll, setSelectAll] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +36,31 @@ const AddUser = ({ onUserAdded }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (name === "password") checkPasswordStrength(value);
+  };
+
+  const handlePermissionToggle = (permissionId) => {
+    setFormData((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(permissionId)
+        ? prev.permissions.filter((p) => p !== permissionId)
+        : [...prev.permissions, permissionId]
+    }));
+    // Update select all state
+    const newPermissions = formData.permissions.includes(permissionId)
+      ? formData.permissions.filter((p) => p !== permissionId)
+      : [...formData.permissions, permissionId];
+    setSelectAll(newPermissions.length === availablePermissions.length);
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setFormData((prev) => ({ ...prev, permissions: [] }));
+      setSelectAll(false);
+    } else {
+      const allPermissions = availablePermissions.map((p) => p.id);
+      setFormData((prev) => ({ ...prev, permissions: allPermissions }));
+      setSelectAll(true);
+    }
   };
 
   const checkPasswordStrength = (password) => {
@@ -56,7 +97,7 @@ const AddUser = ({ onUserAdded }) => {
     try {
       await axios.post(`http://localhost:5000/api/admin-users`, formData);
       alert("User created successfully!");
-      setFormData({ name: "", email: "", phone: "", password: "", role: "admin", status: "active" });
+      setFormData({ name: "", email: "", phone: "", password: "", role: "admin", status: "active", permissions: [] });
       setPasswordStrength(0);
       setPasswordError("");
       if (onUserAdded) onUserAdded();  
@@ -233,6 +274,41 @@ const AddUser = ({ onUserAdded }) => {
                     />
                     <span className="font-medium text-gray-700">Inactive</span>
                   </label>
+                </div>
+              </div>
+
+              {/* Permissions */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    <Shield size={16} className="text-[#E5B236]" />
+                    Page Access Permissions
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-[#E5B236] focus:ring-[#E5B236] rounded"
+                    />
+                    Select All
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  {availablePermissions.map((permission) => (
+                    <label
+                      key={permission.id}
+                      className="flex items-center gap-2 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.permissions.includes(permission.id)}
+                        onChange={() => handlePermissionToggle(permission.id)}
+                        className="w-4 h-4 text-[#E5B236] focus:ring-[#E5B236] rounded"
+                      />
+                      <span className="text-sm text-gray-700">{permission.label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 

@@ -32,6 +32,9 @@ function Login() {
 
       localStorage.setItem("adminUser", JSON.stringify(response.data.user));
       localStorage.setItem("adminToken", response.data.token);
+      console.log("User data saved to localStorage:", response.data.user);
+      console.log("User permissions:", response.data.user.permissions);
+      window.dispatchEvent(new Event('custom-storage-update'));
       
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email);

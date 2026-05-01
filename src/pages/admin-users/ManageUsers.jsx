@@ -11,6 +11,20 @@ const ManageUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
 
+  const availablePermissions = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "user-list", label: "User Management" },
+    { id: "add-user", label: "Add User" },
+    { id: "product-list", label: "Product List" },
+    { id: "add-product", label: "Add Product" },
+    { id: "order-list", label: "Order Management" },
+    { id: "manage-sellers", label: "Seller Management" },
+    { id: "manage-enquires", label: "Enquiry Management" },
+    { id: "blog-list", label: "Blog Management" },
+    { id: "add-blog", label: "Add Blog" },
+    { id: "website-users", label: "Website Users" },
+  ];
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -36,7 +50,7 @@ const ManageUsers = () => {
       await axios.delete(`${API_BASE_URL}/admin-users/${id}`);
       setUsers(users.filter((u) => u._id !== id));
       if (selectedUser) setSelectedUser(null);
-    } catch (err) {
+    } catch {
       alert("Failed to delete user");
     }
   };
@@ -47,7 +61,7 @@ const ManageUsers = () => {
       const newStatus = user.status === "active" ? "inactive" : "active";
       await axios.put(`${API_BASE_URL}/admin-users/${id}`, { status: newStatus });
       setUsers(users.map(u => u._id === id ? { ...u, status: newStatus } : u));
-    } catch (err) {
+    } catch {
       alert("Failed to update status");
     }
   };
@@ -59,9 +73,18 @@ const ManageUsers = () => {
       alert("User updated successfully!");
       setEditingUser(null);
       fetchUsers();
-    } catch (err) {
+    } catch {
       alert("Failed to update user");
     }
+  };
+
+  const handlePermissionToggle = (permissionId) => {
+    setEditingUser((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(permissionId)
+        ? prev.permissions.filter((p) => p !== permissionId)
+        : [...prev.permissions, permissionId]
+    }));
   };
 
   const filteredUsers = users.filter((user) =>
@@ -159,7 +182,7 @@ const ManageUsers = () => {
                     <td className="px-8 py-4 text-center">
                       <button
                         onClick={() => handleToggleStatus(user._id)}
-                        className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-tight border cursor-pointer transition-all hover:scale-105"
+                        className="inline-flex items-center border-slate-300 gap-1.5 py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-tight border cursor-pointer transition-all hover:scale-105"
                       >
                         {user.status === "active" ? (
                           <span className="bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center gap-1">
@@ -236,6 +259,18 @@ const ManageUsers = () => {
               <DetailRow label="Phone" value={selectedUser.phone || "N/A"} icon={<Phone size={16}/>} />
               <DetailRow label="Role" value={selectedUser.role || "admin"} icon={<Shield size={16}/>} />
               <DetailRow label="Status" value={selectedUser.status || "active"} icon={selectedUser.status === "active" ? <CheckCircle size={16}/> : <XCircle size={16}/>} />
+              <div className="p-3 bg-slate-50 rounded-xl">
+                <div className="text-[10px] text-slate-400 font-bold uppercase mb-2">Permissions</div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedUser.permissions && selectedUser.permissions.length > 0 ? (
+                    selectedUser.permissions.map((permission) => (
+                      <PermissionBadge key={permission} permission={permission} />
+                    ))
+                  ) : (
+                    <span className="text-sm text-slate-500 italic">No specific permissions assigned</span>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="p-8 border-t bg-slate-50 flex justify-center">
               <button onClick={() => setSelectedUser(null)} className="bg-slate-800 text-white px-10 py-3 rounded-2xl text-sm font-bold shadow-lg hover:scale-105 transition-all">
@@ -249,7 +284,7 @@ const ManageUsers = () => {
       {/* Edit Modal */}
       {editingUser && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden">
+          <div className="bg-white h-[90vh] w-full max-w-lg shadow-2xl overflow-y-scroll">
             <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-white">
               <div className="flex items-center gap-4">
                 <div className="bg-[#E5B236]/10 p-3 rounded-2xl text-[#E5B236]">
@@ -317,6 +352,25 @@ const ManageUsers = () => {
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
+              <div>
+                <label className="text-sm font-bold text-gray-700 uppercase tracking-wide block mb-2">Permissions</label>
+                <div className="max-h-32 overflow-y-auto border-2 border-gray-200 rounded-xl p-3 bg-gray-50">
+                  {availablePermissions.map((permission) => (
+                    <label
+                      key={permission.id}
+                      className="flex items-center gap-2 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={editingUser.permissions?.includes(permission.id) || false}
+                        onChange={() => handlePermissionToggle(permission.id)}
+                        className="w-4 h-4 text-[#E5B236] focus:ring-[#E5B236] rounded"
+                      />
+                      <span className="text-sm text-gray-700">{permission.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </form>
             <div className="p-8 border-t bg-slate-50 flex justify-center gap-4">
               <button onClick={() => setEditingUser(null)} className="bg-slate-200 text-slate-700 px-8 py-3 rounded-2xl text-sm font-bold hover:scale-105 transition-all">
@@ -361,5 +415,26 @@ const DetailRow = ({ label, value, icon }) => (
     </div>
   </div>
 );
+
+const PermissionBadge = ({ permission }) => {
+  const labels = {
+    dashboard: "Dashboard",
+    "user-list": "User Management",
+    "add-user": "Add User",
+    "product-list": "Product List",
+    "add-product": "Add Product",
+    "order-list": "Order Management",
+    "manage-sellers": "Seller Management",
+    "manage-enquires": "Enquiry Management",
+    "blog-list": "Blog Management",
+    "add-blog": "Add Blog",
+    "website-users": "Website Users",
+  };
+  return (
+    <span className="inline-block px-2 py-1 bg-[#E5B236]/10 text-[#E5B236] text-xs font-bold rounded-full">
+      {labels[permission] || permission}
+    </span>
+  );
+};
 
 export default ManageUsers;

@@ -16,10 +16,12 @@ import AddProduct from "./pages/products/AddProduct";
 import ManageProducts from "./pages/products/ManageProducts";
 import ToastNotification from "../../frontend/src/modals/ToastNotification";
 import AddContact from "./pages/enquiry/AddContact";
+import ManageWebsiteUsers from "./pages/website-users/ManageWebsiteUsers";
+import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
   return (
-    <>
+    <NotificationProvider>
       <Routes>
         {/* Login Page - Default Route */}
         <Route
@@ -150,9 +152,19 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/website-users"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ManageWebsiteUsers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <ToastNotification />
-    </>
+    </NotificationProvider>
   );
 };
 

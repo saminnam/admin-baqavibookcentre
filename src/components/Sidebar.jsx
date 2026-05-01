@@ -10,6 +10,7 @@ import {
   Mail,
   Users,
   Layers,
+  Globe,
 } from "lucide-react";
 import logo from "../assets/logos/logo-bg.png";
 
@@ -19,56 +20,95 @@ const navItems = [
     label: "Dashboard",
     children: [],
     link: "/dashboard",
+    permission: "dashboard",
   },
   {
     icon: (
       <ShoppingCart className="text-2xl text-gray-600 dark:text-gray-400" />
     ),
     label: "Orders",
-    children: [{ label: "Manage Orders", link: "/order-list" }],
+    children: [{ label: "Manage Orders", link: "/order-list", permission: "order-list" }],
+    permission: "order-list",
   },
   {
     icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Products",
     children: [
-      { label: "Add Products", link: "/add-product" },
-      { label: "Manage Products", link: "/product-list" },
+      { label: "Add Products", link: "/add-product", permission: "add-product" },
+      { label: "Manage Products", link: "/product-list", permission: "product-list" },
     ],
+    permission: "product-list",
   },
   {
     icon: <FileText className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Blogs",
     children: [
-      { label: "Add Blogs", link: "/add-blog" },
-      { label: "Manage Blogs", link: "/blog-list" },
+      { label: "Add Blogs", link: "/add-blog", permission: "add-blog" },
+      { label: "Manage Blogs", link: "/blog-list", permission: "blog-list" },
     ],
+    permission: "blog-list",
   },
   {
     icon: <Store className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Sellers",
-    children: [{ label: "Manage Sellers", link: "/manage-sellers" }],
+    children: [{ label: "Manage Sellers", link: "/manage-sellers", permission: "manage-sellers" }],
+    permission: "manage-sellers",
   },
   {
     icon: <Mail className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Contacts",
     children: [
       { label: "Add Contact", link: "/add-contact" },
-      { label: "Manage Enquires", link: "/manage-enquires" },
+      { label: "Manage Enquires", link: "/manage-enquires", permission: "manage-enquires" },
     ],
+    permission: "manage-enquires",
   },
   {
     icon: <Users className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "System Users",
     children: [
-      { label: "Add Users", link: "/add-user" },
-      { label: "Manage Users", link: "/user-list" },
+      { label: "Add Users", link: "/add-user", permission: "add-user" },
+      { label: "Manage Users", link: "/user-list", permission: "user-list" },
     ],
+    permission: "user-list",
+  },
+  {
+    icon: <Globe className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Website Users",
+    children: [],
+    link: "/website-users",
+    permission: "website-users",
   },
 ];
 
 const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [mobileSiderBar, setMobileSidebar] = useState(false);
+  const [userPermissions, setUserPermissions] = useState([]);
+
+  useEffect(() => {
+    const loadPermissions = () => {
+      const user = localStorage.getItem("adminUser");
+      if (user) {
+        const userData = JSON.parse(user);
+        console.log("Loading permissions from localStorage:", userData.permissions);
+        setUserPermissions(userData.permissions || []);
+      }
+    };
+
+    loadPermissions();
+
+    const handleStorageChange = () => {
+      loadPermissions();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('custom-storage-update', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('custom-storage-update', handleStorageChange);
+    };
+  }, []);
 
   const handleDropdownToggle = (label) => {
     if (sidebarExpanded || hoveringSidebar) {
@@ -76,21 +116,26 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
     }
   };
 
-  const setSidebarClose = () => {
-    if (window.innerWidth <= 580) {
-      setMobileSidebar(true);
-    } else {
-      setMobileSidebar(false);
-    }
+  const hasPermission = (permission) => {
+    if (!permission) return true;
+    // If permissions is undefined/null (old users), show all
+    if (userPermissions === undefined || userPermissions === null) return true;
+    // If permissions is empty array, show all (treat as full access)
+    if (userPermissions.length === 0) return true;
+    // If permissions has items, check if user has the specific permission
+    return userPermissions.includes(permission);
   };
 
-  useEffect(() => {
-    setSidebarClose();
-    window.addEventListener("resize", setSidebarClose);
-    return () => {
-      window.removeEventListener("resize", setSidebarClose);
-    };
-  }, []);
+  const filteredNavItems = navItems
+    .filter((item) => hasPermission(item.permission))
+    .map((item) => ({
+      ...item,
+      children: item.children.filter((child) => hasPermission(child.permission)),
+    }))
+    .filter((item) => item.children.length > 0 || !item.permission || hasPermission(item.permission));
+
+  console.log("User permissions:", userPermissions);
+  console.log("Filtered nav items:", filteredNavItems);
 
   return (
     <div className="flex">
@@ -118,7 +163,7 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
         </div>
         <nav className="mt-5 px-2 text-[14px]">
           <ul className="flex flex-col gap-2 max-w-[280px] mx-auto">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <li key={item.label}>
                 <Link
                   to={item.link}
