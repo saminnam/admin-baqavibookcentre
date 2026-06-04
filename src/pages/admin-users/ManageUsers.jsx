@@ -1,8 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Users, Search, Eye, Edit2, Trash2, X, Shield, Mail, Phone, CheckCircle, XCircle, ToggleLeft, ToggleRight, Loader2, RefreshCw, MoreVertical } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
-const API_BASE_URL = "http://localhost:5000/api";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);

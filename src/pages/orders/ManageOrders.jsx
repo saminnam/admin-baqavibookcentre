@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   Package, Search, Eye, Trash2, CheckCircle, Truck, Clock, X, Mail, MapPin, Phone, User, Ban
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,7 +14,7 @@ const ManageOrders = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products?limit=1000");
+      const res = await axios.get(`${API_BASE_URL}/products?limit=1000`);
       const productsData = res.data.products || res.data;
       const productMap = {};
       productsData.forEach((p) => {
@@ -28,7 +29,7 @@ const ManageOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/orders");
+      const res = await axios.get(`${API_BASE_URL}/orders`);
       setOrders(res.data);
     } catch (error) {
       console.error(error);
@@ -39,7 +40,7 @@ const ManageOrders = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/orders/status/${id}`, {
+      await axios.patch(`${API_BASE_URL}/orders/status/${id}`, {
         status: newStatus,
       });
       fetchOrders();

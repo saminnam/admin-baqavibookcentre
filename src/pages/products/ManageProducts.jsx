@@ -14,6 +14,7 @@ import {
   Link as LinkIcon,
   AlertTriangle,
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -35,7 +36,7 @@ const ManageProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/products?limit=1000");
+      const { data } = await axios.get(`${API_BASE_URL}/products?limit=1000`);
       const productsData = data.products || data;
       setProducts(Array.isArray(productsData) ? productsData : []);
     } catch (err) {
@@ -82,7 +83,7 @@ const ManageProducts = () => {
   const deleteProduct = async (id) => {
     if (window.confirm("Delete this product permanently?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/products/${id}`);
+        await axios.delete(`${API_BASE_URL}/products/${id}`);
         fetchProducts();
         toast.success("Product Deleted");
       } catch (err) {
@@ -109,7 +110,7 @@ const ManageProducts = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://localhost:5000/api/products/${selectedProduct._id}`,
+        `${API_BASE_URL}/products/${selectedProduct._id}`,
         selectedProduct,
       );
       toast.success("Product Updated Successfully!");

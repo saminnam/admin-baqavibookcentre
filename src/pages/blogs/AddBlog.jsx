@@ -14,6 +14,7 @@ import {
   Type,
   AlignLeft,
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const AddBlog = () => {
   const [form, setForm] = useState({
@@ -126,7 +127,7 @@ const AddBlog = () => {
       }
 
       // ✅ ONLY ONE API CALL
-      await axios.post("http://localhost:5000/api/blogs", formData, {
+      await axios.post(`${API_BASE_URL}/blogs`, formData, {
         
         headers: {
           "Content-Type": "multipart/form-data",

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Trash2, Edit3, Plus, Image as ImageIcon } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:5000/api/hero-slides";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageHeroSlides = () => {
   const [slides, setSlides] = useState([]);
@@ -19,7 +18,7 @@ const ManageHeroSlides = () => {
 
   const fetchSlides = async () => {
     try {
-      const { data } = await axios.get(API_BASE_URL);
+      const { data } = await axios.get(`${API_BASE_URL}/hero-slides`);
       setSlides(data);
     } catch (error) {
       toast.error("Failed to fetch hero slides");

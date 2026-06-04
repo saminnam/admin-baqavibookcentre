@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Shield, Plus, Edit, Trash2, CheckSquare, Square, Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const availablePermissions = [
   { id: "dashboard", label: "Dashboard" },
@@ -34,7 +35,7 @@ const RolesAndPermissions = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/roles");
+      const response = await axios.get(`${API_BASE_URL}/roles`);
       setRoles(response.data);
     } catch (error) {
       console.error("Failed to fetch roles:", error);
@@ -71,11 +72,11 @@ const RolesAndPermissions = () => {
     try {
       console.log("Submitting form data:", formData);
       if (editingRole) {
-        const response = await axios.put(`http://localhost:5000/api/roles/${editingRole._id}`, formData);
+        const response = await axios.put(`${API_BASE_URL}/roles/${editingRole._id}`, formData);
         console.log("Update response:", response.data);
         alert("Role updated successfully!");
       } else {
-        const response = await axios.post("http://localhost:5000/api/roles", formData);
+        const response = await axios.post(`${API_BASE_URL}/roles`, formData);
         console.log("Create response:", response.data);
         alert("Role created successfully!");
       }
@@ -104,7 +105,7 @@ const RolesAndPermissions = () => {
   const handleDelete = async (roleId) => {
     if (!window.confirm("Are you sure you want to delete this role?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/roles/${roleId}`);
+      await axios.delete(`${API_BASE_URL}/roles/${roleId}`);
       alert("Role deleted successfully!");
       fetchRoles();
     } catch (error) {

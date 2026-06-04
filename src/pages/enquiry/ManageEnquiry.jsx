@@ -5,6 +5,7 @@ import {
   MessageSquare, Loader2, RefreshCw, Eye, X, 
   CheckCircle, Clock, RotateCcw, Filter, ArrowUpDown
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageEnquiry = () => {
   const [enquiries, setEnquiries] = useState([]);
@@ -16,7 +17,7 @@ const ManageEnquiry = () => {
   const fetchEnquiries = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/contact/enquiries");
+      const res = await axios.get(`${API_BASE_URL}/contact/enquiries`);
       setEnquiries(res.data);
     } catch (error) {
       console.error("Error fetching enquiries:", error);
@@ -27,7 +28,7 @@ const ManageEnquiry = () => {
 
   const handleVerify = async (id) => {
     try {
-      const res = await axios.patch(`http://localhost:5000/api/contact/enquiries/${id}/verify`);
+      const res = await axios.patch(`${API_BASE_URL}/contact/enquiries/${id}/verify`);
       if (res.status === 200) {
         fetchEnquiries(); 
         if (selectedEnquiry) setSelectedEnquiry(null);
@@ -40,7 +41,7 @@ const ManageEnquiry = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this enquiry permanently?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/contact/enquiries/${id}`);
+        await axios.delete(`${API_BASE_URL}/contact/enquiries/${id}`);
         setEnquiries(enquiries.filter(item => item._id !== id));
         if (selectedEnquiry) setSelectedEnquiry(null);
       } catch (error) {

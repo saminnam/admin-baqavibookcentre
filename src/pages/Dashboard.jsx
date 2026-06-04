@@ -17,8 +17,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
-const API_BASE_URL = "http://localhost:5000/api";
+import { API_BASE_URL } from "../components/Api";
 
 ChartJS.register(
   CategoryScale,

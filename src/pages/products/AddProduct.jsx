@@ -14,6 +14,7 @@ import {
   Link as LinkIcon,
   X,
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -123,7 +124,7 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/products", formData);
+      await axios.post(`${API_BASE_URL}/products`, formData);
 
       // 🟢 1. Trigger the toast
       toast.success("Product Published Successfully!");

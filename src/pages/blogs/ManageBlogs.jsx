@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   FileText,
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -33,7 +34,7 @@ const ManageBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/blogs");
+      const { data } = await axios.get(`${API_BASE_URL}/blogs`);
       setBlogs(data);
     } catch (err) {
       console.error("Failed to fetch blogs", err);
@@ -53,7 +54,7 @@ const ManageBlogs = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Move this article to trash?")) {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`);
+      await axios.delete(`${API_BASE_URL}/blogs/${id}`);
       fetchBlogs();
     }
   };
@@ -62,9 +63,9 @@ const ManageBlogs = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/blogs/${editingId}`, form);
+        await axios.put(`${API_BASE_URL}/blogs/${editingId}`, form);
       } else {
-        await axios.post("http://localhost:5000/api/blogs", form);
+        await axios.post(`${API_BASE_URL}/blogs`, form);
       }
       setIsModalOpen(false);
       fetchBlogs();

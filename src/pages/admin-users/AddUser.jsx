@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { UserPlus, Shield, Mail, Phone, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const AddUser = ({ onUserAdded }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const AddUser = ({ onUserAdded }) => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/roles");
+      const response = await axios.get(`${API_BASE_URL}/roles`);
       setRoles(response.data);
     } catch (error) {
       console.error("Failed to fetch roles:", error);
@@ -68,7 +69,7 @@ const AddUser = ({ onUserAdded }) => {
 
     setLoading(true);
     try {
-      await axios.post(`http://localhost:5000/api/admin-users`, formData);
+      await axios.post(`${API_BASE_URL}/admin-users`, formData);
       alert("User created successfully!");
       setFormData({ name: "", email: "", phone: "", password: "", role: "", status: "active" });
       setPasswordStrength(0);

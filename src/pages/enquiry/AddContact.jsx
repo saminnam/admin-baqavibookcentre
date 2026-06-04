@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Edit2, X, MapPin, Phone, Mail, Globe, Loader2, Facebook, MessageCircle, Radio, Youtube } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../../components/Api';
 
 const AddContact = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,7 +23,7 @@ const AddContact = () => {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/contact/info');
+        const res = await axios.get(`${API_BASE_URL}/contact/info`);
         setContactData(res.data);
       } catch (error) {
         console.error('Error fetching contact info:', error);
@@ -41,7 +42,7 @@ const AddContact = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await axios.put('http://localhost:5000/api/contact/info', contactData);
+      const res = await axios.put(`${API_BASE_URL}/contact/info`, contactData);
       if (res.data.success) {
         setIsEditing(false);
         alert("Contact information updated successfully!");

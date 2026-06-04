@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Clock as ClockIcon,
 } from "lucide-react";
+import { API_BASE_URL } from "../../components/Api";
 
 const ManageSellers = () => {
   const [sellers, setSellers] = useState([]);
@@ -28,7 +29,7 @@ const ManageSellers = () => {
   // 1. Fetch Data
   const fetchSellers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/seller");
+      const res = await axios.get(`${API_BASE_URL}/seller`);
       setSellers(Array.isArray(res.data) ? res.data : []);
       setLoading(false);
     } catch (error) {
@@ -41,7 +42,7 @@ const ManageSellers = () => {
   const deleteSeller = async (id) => {
     if (window.confirm("Remove this seller from the database?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/seller/${id}`);
+        await axios.delete(`${API_BASE_URL}/seller/${id}`);
         setSellers(sellers.filter((s) => s._id !== id));
       } catch (error) {
         alert("Delete failed");
@@ -63,7 +64,7 @@ const ManageSellers = () => {
   const toggleVerify = async (id) => {
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/seller/${id}/toggle-verify`,
+        `${API_BASE_URL}/seller/${id}/toggle-verify`,
       );
       setSellers(sellers.map((s) => (s._id === id ? res.data : s)));
     } catch (error) {
