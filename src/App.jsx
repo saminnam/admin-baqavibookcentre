@@ -17,6 +17,9 @@ import ManageProducts from "./pages/products/ManageProducts";
 import ToastNotification from "../../frontend/src/modals/ToastNotification";
 import AddContact from "./pages/enquiry/AddContact";
 import ManageWebsiteUsers from "./pages/website-users/ManageWebsiteUsers";
+import RolesAndPermissions from "./pages/roles/RolesAndPermissions";
+import ManageHeroSlides from "./pages/hero-slides/ManageHeroSlides";
+import ManageOfferHeroSlides from "./pages/offer-hero-slides/ManageOfferHeroSlides";
 import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
@@ -143,6 +146,16 @@ const App = () => {
         />
 
         <Route
+          path="/manage-roles"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <RolesAndPermissions />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/product-list"
           element={
             <ProtectedRoute>
@@ -158,6 +171,26 @@ const App = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <ManageWebsiteUsers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-hero-slides"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ManageHeroSlides />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-offer-hero-slides"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ManageOfferHeroSlides />
               </DashboardLayout>
             </ProtectedRoute>
           }

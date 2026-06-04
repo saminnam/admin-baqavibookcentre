@@ -72,12 +72,29 @@ const navItems = [
     ],
     permission: "user-list",
   },
+   {
+    icon: <Users className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Roles & Permission",
+    children: [
+      { label: "Manage Roles", link: "/manage-roles", permission: "manage-roles" },
+    ],
+    permission: "manage-roles",
+  },
   {
     icon: <Globe className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Website Users",
     children: [],
     link: "/website-users",
     permission: "website-users",
+  },
+  {
+    icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Hero Slides",
+    children: [
+      { label: "Manage Hero Slides", link: "/manage-hero-slides", permission: "manage-hero-slides" },
+      { label: "Manage Offer Slides", link: "/manage-offer-hero-slides", permission: "manage-offer-hero-slides" },
+    ],
+    permission: "manage-hero-slides",
   },
 ];
 
