@@ -20,7 +20,7 @@ import ManageWebsiteUsers from "./pages/website-users/ManageWebsiteUsers";
 import RolesAndPermissions from "./pages/roles/RolesAndPermissions";
 import ManageHeroSlides from "./pages/hero-slides/ManageHeroSlides";
 import ManageOfferHeroSlides from "./pages/offer-hero-slides/ManageOfferHeroSlides";
-import { NotificationProvider } from "./context/NotificationContext";
+// import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
   return (
