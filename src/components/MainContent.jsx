@@ -62,7 +62,7 @@ const MainContent = ({
         sidebarExpanded || hoveringSidebar ? "ml-72" : "ml-16"
       }`}
     >
-      {/* Header */}
+  
       <div
         className="h-16 fixed top-0 right-0 z-50 bg-[#F8F9FB] flex justify-between items-center border-b-2 shadow border-b-[#E5E8F3] px-3"
         style={{
