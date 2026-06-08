@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://e-commerce-app-backend-livid.vercel.app/apihttps://e-commerce-app-backend1.vercel.app/api"
+export const API_BASE_URL = "https://e-commerce-app-backend1.vercel.app/api";
