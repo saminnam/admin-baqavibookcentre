@@ -128,14 +128,15 @@ const AddBlog = () => {
 
       // ✅ ONLY ONE API CALL
       await axios.post(`${API_BASE_URL}/blogs`, formData, {
-        
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setSuccess("Blog added successfully!");
+      setErrors({});
 
+      // Reset form
       setForm({
         title: "",
         excerpt: "",
@@ -148,8 +149,10 @@ const AddBlog = () => {
       setPreviewUrl("");
       setSelectedFile(null);
     } catch (err) {
-      console.error(err);
-      alert("Server error");
+      console.error("Blog submission error:", err);
+      const errorMessage = err.response?.data?.message || err.message || "Failed to add blog. Please try again.";
+      setErrors({ submit: errorMessage });
+      alert(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

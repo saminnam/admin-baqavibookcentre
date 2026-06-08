@@ -37,7 +37,8 @@ const ManageBlogs = () => {
       const { data } = await axios.get(`${API_BASE_URL}/blogs`);
       setBlogs(data);
     } catch (err) {
-      console.error("Failed to fetch blogs", err);
+      console.error("Failed to fetch blogs:", err.message);
+      alert(`Error fetching blogs: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -54,8 +55,13 @@ const ManageBlogs = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Move this article to trash?")) {
-      await axios.delete(`${API_BASE_URL}/blogs/${id}`);
-      fetchBlogs();
+      try {
+        await axios.delete(`${API_BASE_URL}/blogs/${id}`);
+        fetchBlogs();
+      } catch (err) {
+        console.error("Delete error:", err.message);
+        alert(`Error deleting blog: ${err.response?.data?.message || err.message}`);
+      }
     }
   };
 
@@ -70,7 +76,9 @@ const ManageBlogs = () => {
       setIsModalOpen(false);
       fetchBlogs();
     } catch (err) {
-      alert("Error saving blog post");
+      console.error("Submit error:", err.message);
+      const errorMessage = err.response?.data?.message || err.message || "Error saving blog post";
+      alert(`Error: ${errorMessage}`);
     }
   };
 
