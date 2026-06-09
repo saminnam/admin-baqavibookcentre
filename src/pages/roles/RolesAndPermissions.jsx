@@ -121,19 +121,19 @@ const RolesAndPermissions = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="p-6 min-h-screen">
+      <div className="">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#E5B236] to-[#d4a32e] p-8">
+          <div className="p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-xl text-white">
+                <div className="p-3 rounded-xl text-[#E5B236]">
                   <Shield size={32} />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-white">Roles & Permissions</h1>
-                  <p className="text-white/80 mt-1">Manage user roles and their access permissions</p>
+                  <h1 className="text-3xl font-bold text-slate-800">Roles & Permissions</h1>
+                  <p className="text-slate-600 mt-1">Manage user roles and their access permissions</p>
                 </div>
               </div>
               <button
@@ -141,7 +141,7 @@ const RolesAndPermissions = () => {
                   resetForm();
                   setIsEditing(true);
                 }}
-                className="flex items-center gap-2 bg-white text-[#E5B236] px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition"
+                className="flex items-center border border-slate-200 gap-2 bg-white text-[#E5B236] px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition"
               >
                 <Plus size={20} /> Add Role
               </button>
@@ -151,7 +151,7 @@ const RolesAndPermissions = () => {
           <div className="p-8">
             {/* Form */}
             {isEditing && (
-              <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="mb-8 p-6 rounded-xl border border-gray-200">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   {editingRole ? "Edit Role" : "Add New Role"}
                 </h2>
@@ -164,7 +164,7 @@ const RolesAndPermissions = () => {
                       <input
                         type="text"
                         name="name"
-                        className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition"
+                        className="w-full p-3 border-2 bg-white border-gray-200 rounded-lg focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition"
                         placeholder="Enter role name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}

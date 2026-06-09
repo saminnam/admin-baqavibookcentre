@@ -23,19 +23,46 @@ const navItems = [
     permission: "dashboard",
   },
   {
+    icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Hero Slides",
+    children: [
+      {
+        label: "Manage Hero Slides",
+        link: "/manage-hero-slides",
+        permission: "manage-hero-slides",
+      },
+      {
+        label: "Manage Offer Slides",
+        link: "/manage-offer-hero-slides",
+        permission: "manage-offer-hero-slides",
+      },
+    ],
+    permission: "manage-hero-slides",
+  },
+  {
     icon: (
       <ShoppingCart className="text-2xl text-gray-600 dark:text-gray-400" />
     ),
     label: "Orders",
-    children: [{ label: "Manage Orders", link: "/order-list", permission: "order-list" }],
+    children: [
+      { label: "Manage Orders", link: "/order-list", permission: "order-list" },
+    ],
     permission: "order-list",
   },
   {
     icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Products",
     children: [
-      { label: "Add Products", link: "/add-product", permission: "add-product" },
-      { label: "Manage Products", link: "/product-list", permission: "product-list" },
+      {
+        label: "Add Products",
+        link: "/add-product",
+        permission: "add-product",
+      },
+      {
+        label: "Manage Products",
+        link: "/product-list",
+        permission: "product-list",
+      },
     ],
     permission: "product-list",
   },
@@ -51,7 +78,13 @@ const navItems = [
   {
     icon: <Store className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Sellers",
-    children: [{ label: "Manage Sellers", link: "/manage-sellers", permission: "manage-sellers" }],
+    children: [
+      {
+        label: "Manage Sellers",
+        link: "/manage-sellers",
+        permission: "manage-sellers",
+      },
+    ],
     permission: "manage-sellers",
   },
   {
@@ -59,7 +92,11 @@ const navItems = [
     label: "Contacts",
     children: [
       { label: "Add Contact", link: "/add-contact" },
-      { label: "Manage Enquires", link: "/manage-enquires", permission: "manage-enquires" },
+      {
+        label: "Manage Enquires",
+        link: "/manage-enquires",
+        permission: "manage-enquires",
+      },
     ],
     permission: "manage-enquires",
   },
@@ -72,11 +109,15 @@ const navItems = [
     ],
     permission: "user-list",
   },
-   {
+  {
     icon: <Users className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Roles & Permission",
     children: [
-      { label: "Manage Roles", link: "/manage-roles", permission: "manage-roles" },
+      {
+        label: "Manage Roles",
+        link: "/manage-roles",
+        permission: "manage-roles",
+      },
     ],
     permission: "manage-roles",
   },
@@ -86,15 +127,6 @@ const navItems = [
     children: [],
     link: "/website-users",
     permission: "website-users",
-  },
-  {
-    icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
-    label: "Hero Slides",
-    children: [
-      { label: "Manage Hero Slides", link: "/manage-hero-slides", permission: "manage-hero-slides" },
-      { label: "Manage Offer Slides", link: "/manage-offer-hero-slides", permission: "manage-offer-hero-slides" },
-    ],
-    permission: "manage-hero-slides",
   },
 ];
 
@@ -107,7 +139,10 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
       const user = localStorage.getItem("adminUser");
       if (user) {
         const userData = JSON.parse(user);
-        console.log("Loading permissions from localStorage:", userData.permissions);
+        console.log(
+          "Loading permissions from localStorage:",
+          userData.permissions,
+        );
         setUserPermissions(userData.permissions || []);
       }
     };
@@ -118,12 +153,12 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
       loadPermissions();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('custom-storage-update', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("custom-storage-update", handleStorageChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('custom-storage-update', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("custom-storage-update", handleStorageChange);
     };
   }, []);
 
@@ -147,9 +182,16 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
     .filter((item) => hasPermission(item.permission))
     .map((item) => ({
       ...item,
-      children: item.children.filter((child) => hasPermission(child.permission)),
+      children: item.children.filter((child) =>
+        hasPermission(child.permission),
+      ),
     }))
-    .filter((item) => item.children.length > 0 || !item.permission || hasPermission(item.permission));
+    .filter(
+      (item) =>
+        item.children.length > 0 ||
+        !item.permission ||
+        hasPermission(item.permission),
+    );
 
   console.log("User permissions:", userPermissions);
   console.log("Filtered nav items:", filteredNavItems);
@@ -166,11 +208,7 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
       >
         <div className="p-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img
-              src={logo}
-              alt="Logo-Gold"
-              className="w-12"
-            />
+            <img src={logo} alt="Logo-Gold" className="w-12" />
             {(sidebarExpanded || hoveringSidebar) && (
               <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
                 ADMIN PANEL

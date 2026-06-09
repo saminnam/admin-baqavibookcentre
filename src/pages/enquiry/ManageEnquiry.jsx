@@ -74,13 +74,13 @@ const ManageEnquiry = () => {
     });
 
   return (
-    <div className="p-4 md:p-10 bg-slate-50 min-h-screen font-sans text-slate-900">
+    <div className="p-6 min-h-screen font-sans text-slate-900">
       
       {/* 1. TOP HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-[#E5B236] rounded-lg text-white">
+            <div className="p-2 text-[#E5B236] rounded-lg">
                <MessageSquare size={24} />
             </div>
             Enquiry Inbox
@@ -104,20 +104,20 @@ const ManageEnquiry = () => {
       </div>
 
       {/* 3. SEARCH & FILTERS BAR */}
-      <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4 mb-6">
+      <div className="bg-white p-3 rounded-3xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
           <input 
             type="text" 
             placeholder="Search by name, email or keyword..."
-            className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 ring-[#E5B236]/20 transition-all text-sm"
+            className="w-full pl-12 pr-4 py-3 outline-none focus:ring-2 ring-[#E5B236]/20 transition-all text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex gap-2">
           <div className="relative flex items-center bg-slate-50 px-4 rounded-xl border border-slate-100">
-            <ArrowUpDown size={16} className="text-slate-400 mr-2" />
+            <ArrowUpDown size={16} className="text-slate-700 mr-2" />
             <select 
               className="bg-transparent outline-none text-sm font-semibold text-slate-600 cursor-pointer py-3"
               value={sortBy}
@@ -134,7 +134,7 @@ const ManageEnquiry = () => {
       {/* 4. DATA TABLE */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+          <div className="flex flex-col items-center justify-center py-32 text-slate-700">
             <Loader2 className="animate-spin mb-4" size={48} />
             <p className="font-medium animate-pulse">Syncing data...</p>
           </div>
@@ -143,10 +143,10 @@ const ManageEnquiry = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Customer info</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Date</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Manage</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-widest">Customer info</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-widest">Date</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-widest text-center">Status</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-widest text-right">Manage</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -159,7 +159,7 @@ const ManageEnquiry = () => {
                         </div>
                         <div>
                           <div className="font-bold text-slate-800">{item.name}</div>
-                          <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5 font-medium italic">
+                          <div className="text-xs text-slate-700 flex items-center gap-1 mt-0.5 font-medium italic">
                             <Mail size={12} /> {item.email}
                           </div>
                         </div>
@@ -167,7 +167,7 @@ const ManageEnquiry = () => {
                     </td>
                     <td className="px-8 py-6">
                       <div className="text-sm font-semibold text-slate-600">{new Date(item.createdAt).toLocaleDateString()}</div>
-                      <div className="text-[10px] text-slate-400 font-bold uppercase">{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                      <div className="text-[10px] text-slate-700 font-bold uppercase">{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                     </td>
                     <td className="px-8 py-6 text-center">
                       {item.verified ? (
@@ -187,7 +187,7 @@ const ManageEnquiry = () => {
                         </button>
                         <button 
                           onClick={() => handleVerify(item._id)} 
-                          className={`p-2.5 rounded-xl transition-all ${item.verified ? 'text-slate-400 hover:text-amber-600 hover:bg-amber-50' : 'text-green-600 hover:bg-green-50'}`}
+                          className={`p-2.5 rounded-xl transition-all ${item.verified ? 'text-slate-700 hover:text-amber-600 hover:bg-amber-50' : 'text-green-600 hover:bg-green-50'}`}
                           title={item.verified ? "Revert to Pending" : "Mark Verified"}
                         >
                           {item.verified ? <RotateCcw size={20} /> : <CheckCircle size={20} />}
@@ -227,7 +227,7 @@ const ManageEnquiry = () => {
                     <p className="text-slate-500 font-medium text-sm">Submitted on {new Date(selectedEnquiry.createdAt).toLocaleString()}</p>
                  </div>
               </div>
-              <button onClick={() => setSelectedEnquiry(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+              <button onClick={() => setSelectedEnquiry(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
                 <X size={24} />
               </button>
             </div>
@@ -282,7 +282,7 @@ const StatCard = ({ label, count, icon, color }) => {
         {icon}
       </div>
       <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">{label}</p>
         <p className="text-3xl font-black text-slate-800 leading-none mt-1">{count}</p>
       </div>
     </div>
@@ -291,7 +291,7 @@ const StatCard = ({ label, count, icon, color }) => {
 
 const InfoRow = ({ label, value, icon, isLink }) => (
   <div>
-    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</div>
+    <div className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-1">{label}</div>
     <div className={`flex items-center gap-2 font-bold text-slate-700 ${isLink ? 'text-blue-600 hover:underline cursor-pointer' : ''}`}>
       {icon} {value}
     </div>

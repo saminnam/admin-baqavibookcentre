@@ -168,7 +168,7 @@ const AddProduct = () => {
         <button
           type="button"
           onClick={() => toggleSource(sectionKey)}
-          className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+          className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
         >
           {sourceType[sectionKey] === "url"
             ? "SWITCH TO UPLOAD"
@@ -180,7 +180,7 @@ const AddProduct = () => {
         <div className="relative">
           <LinkIcon
             size={16}
-            className="absolute left-3 top-3.5 text-slate-400"
+            className="absolute left-3 top-3.5 text-slate-700"
           />
           <input
             name={name}
@@ -192,7 +192,7 @@ const AddProduct = () => {
         </div>
       ) : (
         <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
-          <UploadCloud className="text-slate-400 mb-1" size={24} />
+          <UploadCloud className="text-slate-700 mb-1" size={24} />
           <span className="text-xs text-slate-500">
             Click to select from folder
           </span>
@@ -226,7 +226,7 @@ const AddProduct = () => {
   );
 
   return (
-    <div className="p-4 md:p-10 bg-slate-50 min-h-screen text-slate-900 font-sans">
+    <div className="p-6 min-h-screen text-slate-900 font-sans">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900">
@@ -239,7 +239,7 @@ const AddProduct = () => {
         <button
           form="product-form"
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all"
+          className="bg-[#1E2939] hover:bg-[#090f17] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all"
         >
           <Save size={20} /> Publish
         </button>
@@ -252,9 +252,9 @@ const AddProduct = () => {
       >
         <div className="lg:col-span-2 space-y-6">
           {/* General Information */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-6">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <Layers size={20} className="text-indigo-600" /> General
+              <Layers size={20} className="text-[#E5B234]" /> General
               Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -325,9 +325,9 @@ const AddProduct = () => {
           </div>
 
           {/* Media & Gallery */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-8">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-8">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <ImageIcon size={20} className="text-blue-600" /> Media & Gallery
+              <ImageIcon size={20} className="text-[#E5B234]" /> Media & Gallery
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <ImageUploadBox
@@ -352,7 +352,7 @@ const AddProduct = () => {
                 <button
                   type="button"
                   onClick={() => toggleSource("gallery")}
-                  className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md"
+                  className="text-[10px] font-bold text-[#E5B234] bg-indigo-50 px-2 py-1 rounded-md"
                 >
                   {sourceType.gallery === "url"
                     ? "SWITCH TO UPLOAD"
@@ -378,7 +378,7 @@ const AddProduct = () => {
                 </div>
               ) : (
                 <label className="w-full h-20 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer">
-                  <UploadCloud size={20} className="text-slate-400 mr-2" />
+                  <UploadCloud size={20} className="text-slate-700 mr-2" />
                   <span className="text-sm text-slate-500">
                     Upload Multiple Images
                   </span>
@@ -418,9 +418,9 @@ const AddProduct = () => {
           </div>
 
           {/* Description Section */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <FileText size={20} className="text-emerald-600" /> Descriptions
+              <FileText size={20} className="text-[#E5B234]" /> Descriptions
             </h2>
             <textarea
               name="desc"
@@ -444,13 +444,13 @@ const AddProduct = () => {
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
           {/* Inventory Card */}
-          <div className="bg-[#111825] text-white p-6 rounded-3xl shadow-xl space-y-6">
+          <div className="p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <DollarSign size={20} className="text-indigo-400" /> Inventory
+              <DollarSign size={20} className="text-[#E5B234]" /> Inventory
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">
+                <label className="text-[10px] font-bold text-slate-700 uppercase">
                   MRP (₹)
                 </label>
                 <input
@@ -458,12 +458,12 @@ const AddProduct = () => {
                   type="number"
                   value={formData.mrp}
                   onChange={handleChange}
-                  className="w-full bg-slate-800 border-none rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500"
                   required
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">
+                <label className="text-[10px] font-bold text-slate-700 uppercase">
                   Discount (%)
                 </label>
                 <input
@@ -471,12 +471,12 @@ const AddProduct = () => {
                   type="number"
                   value={formData.discount}
                   onChange={handleChange}
-                  className="w-full bg-slate-800 border-none rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
-            <div className="p-4 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl">
-              <label className="text-[10px] font-bold text-indigo-300 uppercase block mb-1">
+            <div className="p-4 border border-slate-200 rounded-2xl">
+              <label className="text-[10px] font-bold uppercase block mb-1">
                 Selling Price
               </label>
               <span className="text-2xl font-black">
@@ -484,7 +484,7 @@ const AddProduct = () => {
               </span>
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase">
+              <label className="text-[10px] font-bold text-slate-700 uppercase">
                 Stock Level
               </label>
               <input
@@ -492,16 +492,16 @@ const AddProduct = () => {
                 type="number"
                 value={formData.stock}
                 onChange={handleChange}
-                className="w-full bg-slate-800 border-none rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
           </div>
 
           {/* Attributes Card */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-6">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <ListOrdered size={20} className="text-orange-500" /> Attributes
+              <ListOrdered size={20} className="text-[#E5B234]" /> Attributes
             </h2>
             <div className="space-y-4">
               <div className="space-y-1">

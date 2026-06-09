@@ -89,7 +89,7 @@ const ManageOfferHeroSlides = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Manage Offer Hero Slides</h1>
+        <h1 className="text-3xl font-black text-slate-800">Manage Offer Hero Slides</h1>
         <button
           onClick={openAddModal}
           className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -184,7 +184,7 @@ const ManageOfferHeroSlides = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#0000002b] flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">

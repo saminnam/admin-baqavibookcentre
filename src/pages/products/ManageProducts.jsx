@@ -167,12 +167,12 @@ const ManageProducts = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-6 min-h-screen">
       {/* --- Search and Table header (remains same as your code) --- */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Manage Inventory</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-3xl font-black text-slate-800">Manage Inventory</h1>
+          <p className="text-sm text-gray-500 mt-1">
             View, edit, or delete your store products.
           </p>
         </div>
@@ -184,17 +184,17 @@ const ManageProducts = () => {
           <input
             type="text"
             placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500 outline-none bg-white shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 border bg-white border-gray-200 rounded-3xl focus:ring-2 focus:ring-yellow-500 outline-none bg-white shadow-sm"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
       {/* --- Table --- */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-[#111827] text-white">
+            <thead className="border-b border-slate-200">
               <tr>
                 <th className="p-4 text-xs uppercase font-bold">Product</th>
                 <th className="p-4 text-xs uppercase font-bold">Category</th>

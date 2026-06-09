@@ -16,6 +16,7 @@ const MainContent = ({
   const [toggleProfile, setToggleProfile] = useState(false);
   const profileRef = useRef(null); // ref for the whole dropdown container
   const [userData, setUserData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // ✅ Close profile menu when clicking outside
   useEffect(() => {
@@ -39,6 +40,11 @@ const MainContent = ({
     }
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const handleLogout = () => {
     const confirmLogout = window.confirm("Do you want to logout?");
     if (confirmLogout) {
@@ -56,6 +62,22 @@ const MainContent = ({
     return "Good Evening";
   };
 
+  const formattedDate = new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(currentTime);
+
+  const formattedDay = new Intl.DateTimeFormat("en", {
+    weekday: "long",
+  }).format(currentTime);
+
+  const formattedTime = new Intl.DateTimeFormat("en", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(currentTime);
+
   return (
     <div
       className={`flex-1 min-h-screen bg-white transition-all duration-300 ${
@@ -64,7 +86,7 @@ const MainContent = ({
     >
   
       <div
-        className="h-16 fixed top-0 right-0 z-50 bg-[#F8F9FB] flex justify-between items-center border-b-2 shadow border-b-[#E5E8F3] px-3"
+        className="h-16 fixed top-0 right-0 z-50 bg-[#fff] flex justify-between items-center border-b-2 border-b-[#E5E8F3] px-3"
         style={{
           left: sidebarExpanded || hoveringSidebar ? "18rem" : "4rem",
           transition: "left 0.3s ease",
@@ -81,9 +103,18 @@ const MainContent = ({
               }`}
             />
           </button>
-          <h4 className="text-lg md:block hidden font-semibold text-gray-900">
-            {getGreeting()}, {userData?.name || "User"}
-          </h4>
+          <div className="hidden md:block">
+            <h4 className="text-lg font-semibold text-gray-900">
+              {getGreeting()}, {userData?.name || "User"}
+            </h4>
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <span>{formattedDay}</span>
+              <span>•</span>
+              <span>{formattedDate}</span>
+              <span>•</span>
+              <span>{formattedTime}</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative border p-2 text-gray-500 text-xl border-gray-300 rounded cursor-pointer hover:bg-gray-100 transition-colors">

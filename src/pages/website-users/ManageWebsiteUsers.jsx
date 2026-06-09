@@ -43,12 +43,12 @@ const ManageWebsiteUsers = () => {
   );
 
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans">
+    <div className="p-6 min-h-screen">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-[#E5B236] rounded-lg text-white">
+            <div className="text-[#E5B236]">
                <Users size={24} />
             </div>
             Website Users
@@ -71,8 +71,8 @@ const ManageWebsiteUsers = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center px-4 focus-within:ring-2 ring-[#E5B236]/20 transition-all mb-6">
-        <Search className="text-slate-400 mr-3" size={20} />
+      <div className="bg-white p-3 rounded-3xl shadow-sm border border-slate-100 flex items-center px-4 focus-within:ring-2 ring-[#E5B236]/20 transition-all mb-6">
+        <Search className="text-slate-700 mr-3" size={20} />
         <input
           type="text"
           placeholder="Search by name or email..."
@@ -85,7 +85,7 @@ const ManageWebsiteUsers = () => {
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+          <div className="flex flex-col items-center justify-center py-32 text-slate-700">
             <Loader2 className="animate-spin mb-4" size={48} />
             <p className="font-medium animate-pulse">Loading users...</p>
           </div>
@@ -94,10 +94,10 @@ const ManageWebsiteUsers = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider">User Info</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider">Email</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider">Joined Date</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider">User Info</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider">Email</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider">Joined Date</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -113,7 +113,7 @@ const ManageWebsiteUsers = () => {
                         </div>
                         <div>
                           <div className="font-bold text-slate-800">{user.name}</div>
-                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">
+                          <div className="text-[10px] text-slate-700 font-black uppercase tracking-tighter">
                             Website User
                           </div>
                         </div>
@@ -121,11 +121,11 @@ const ManageWebsiteUsers = () => {
                     </td>
                     <td className="px-8 py-4">
                       <div className="text-sm font-bold text-slate-700 flex items-center gap-1">
-                        <Mail size={12} className="text-slate-400" /> {user.email}
+                        <Mail size={12} className="text-slate-700" /> {user.email}
                       </div>
                     </td>
                     <td className="px-8 py-4">
-                      <div className="text-xs text-slate-400 font-medium italic flex items-center gap-1">
+                      <div className="text-xs text-slate-700 font-medium italic flex items-center gap-1">
                         <Calendar size={12} /> {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </div>
                     </td>
@@ -174,10 +174,10 @@ const ManageWebsiteUsers = () => {
                 </div>
                 <div>
                   <h2 className="font-black text-2xl text-slate-800">{selectedUser.name}</h2>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">User Details</p>
+                  <p className="text-slate-700 text-xs font-bold uppercase tracking-widest">User Details</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+              <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
                 <X size={24} />
               </button>
             </div>
@@ -209,7 +209,7 @@ const StatCard = ({ label, count, icon, color }) => {
         {icon}
       </div>
       <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">{label}</p>
         <p className="text-3xl font-black text-slate-800 leading-none mt-1">{count}</p>
       </div>
     </div>
@@ -220,7 +220,7 @@ const DetailRow = ({ label, value, icon }) => (
   <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
     <div className="text-[#E5B236]">{icon}</div>
     <div>
-      <div className="text-[10px] text-slate-400 font-bold uppercase">{label}</div>
+      <div className="text-[10px] text-slate-700 font-bold uppercase">{label}</div>
       <div className="text-sm font-bold text-slate-700">{value}</div>
     </div>
   </div>

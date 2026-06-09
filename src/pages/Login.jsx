@@ -146,7 +146,7 @@ function Login() {
         </div>
 
         {/* Copyright */}
-        <div className="text-center mt-8 text-slate-400 text-sm">
+        <div className="text-center mt-8 text-slate-700 text-sm">
           © 2024 Admin Panel. All rights reserved.
         </div>
       </div>

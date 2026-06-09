@@ -177,14 +177,6 @@ const Dashboard = () => {
     }
   }, [revenueFilter, recentOrders]);
 
-  // Poll for new orders every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDashboardData();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [fetchDashboardData]);
-
   const removeNotification = (id) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
@@ -202,7 +194,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">{title}</h3>
       <p className="text-3xl font-black text-slate-800">{value}</p>
     </div>
   );
@@ -229,7 +221,7 @@ const Dashboard = () => {
             </div>
             <div className="flex-1">
               <p className="text-sm font-bold text-slate-800">{notification.message}</p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-700">
                 {notification.timestamp.toLocaleTimeString()}
               </p>
             </div>
@@ -237,7 +229,7 @@ const Dashboard = () => {
               onClick={() => removeNotification(notification.id)}
               className="p-1 hover:bg-slate-100 rounded-full transition-colors"
             >
-              <X size={16} className="text-slate-400" />
+              <X size={16} className="text-slate-700" />
             </button>
           </div>
         ))}
@@ -393,7 +385,7 @@ const Dashboard = () => {
                 }}
               />
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-400">
+              <div className="flex items-center justify-center h-64 text-slate-700">
                 <Loader2 className="animate-spin" size={32} />
               </div>
             )}
@@ -408,16 +400,16 @@ const Dashboard = () => {
               onClick={fetchDashboardData}
               className="p-2 hover:bg-slate-100 rounded-lg transition"
             >
-              <RefreshCw size={18} className="text-slate-400" />
+              <RefreshCw size={18} className="text-slate-700" />
             </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Order ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Amount</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -433,7 +425,7 @@ const Dashboard = () => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="3" className="px-4 py-8 text-center text-slate-400">
+                    <td colSpan="3" className="px-4 py-8 text-center text-slate-700">
                       No recent orders
                     </td>
                   </tr>

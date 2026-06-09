@@ -63,7 +63,7 @@ const ManageOrders = () => {
   );
 
   return (
-    <div className="p-6 md:p-10 bg-slate-50 min-h-screen font-sans">
+    <div className="p-6 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
           <Package className="text-[#E5B236]" /> Manage Orders
@@ -80,8 +80,8 @@ const ManageOrders = () => {
       </div>
 
       {/* SEARCH */}
-      <div className="bg-white px-3 py-4 rounded-2xl shadow-sm border border-slate-200 mb-6 flex items-center">
-        <Search className="text-slate-400 mr-3" size={20} />
+      <div className="bg-white px-3 py-4 rounded-3xl shadow-sm border border-slate-200 mb-6 flex items-center">
+        <Search className="text-slate-700 mr-3" size={20} />
         <input
           type="text"
           placeholder="Search by Customer Name or Order ID..."
@@ -94,13 +94,13 @@ const ManageOrders = () => {
       {/* TABLE */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="border-b border-slate-200">
             <tr>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400">Order ID / Date</th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400">Customer</th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400">Amount</th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 text-center">Status</th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 text-right">Actions</th>
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700">Order ID / Date</th>
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700">Customer</th>
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700">Amount</th>
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 text-center">Status</th>
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -108,7 +108,7 @@ const ManageOrders = () => {
               <tr key={order._id} className="hover:bg-slate-50/50 transition-all">
                 <td className="px-6 py-4 text-sm font-bold text-slate-600">
                   #{order._id.slice(-6).toUpperCase()}
-                  <div className="text-[10px] font-normal text-slate-400">
+                  <div className="text-[10px] font-normal text-slate-700">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </div>
                 </td>
@@ -143,10 +143,10 @@ const ManageOrders = () => {
             <div className="p-8 border-b border-slate-200 flex justify-between items-center bg-white">
               <div>
                 <h2 className="font-black text-2xl text-slate-800 uppercase tracking-tight">Order Details</h2>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">ID: #{selectedOrder._id}</p>
+                <p className="text-slate-700 text-xs font-bold uppercase tracking-widest mt-1">ID: #{selectedOrder._id}</p>
               </div>
               <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-slate-100 rounded-full transition-all">
-                <X size={24} className="text-slate-400" />
+                <X size={24} className="text-slate-700" />
               </button>
             </div>
 
@@ -184,7 +184,7 @@ const ManageOrders = () => {
                             <div key={idx} className="flex justify-between items-center p-3 border-b border-slate-200/50 last:border-0">
                               <div>
                                 <p className="text-sm font-bold text-slate-800">{product?.name || "Unknown Product"}</p>
-                                <p className="text-[10px] font-black text-slate-400 uppercase">Qty: {p.quantity} × ₹{p.price}</p>
+                                <p className="text-[10px] font-black text-slate-700 uppercase">Qty: {p.quantity} × ₹{p.price}</p>
                               </div>
                               <span className="font-black text-sm text-slate-700">₹{p.price * p.quantity}</span>
                             </div>
@@ -192,7 +192,7 @@ const ManageOrders = () => {
                         })}
                       </div>
                       <div className="p-5 bg-white border-t border-slate-200 flex justify-between items-center">
-                        <span className="font-black text-slate-400 uppercase text-xs">Total Amount</span>
+                        <span className="font-black text-slate-700 uppercase text-xs">Total Amount</span>
                         <span className="text-2xl font-black text-[#E5B236]">₹{selectedOrder.totalAmount}</span>
                       </div>
                     </div>
@@ -228,7 +228,7 @@ const StatCard = ({ label, count, color }) => {
     };
     return (
         <div className={`p-5 bg-white rounded-3xl border shadow-sm border-l-4 ${colors[color]}`}>
-            <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{label}</p>
+            <p className="text-[10px] font-black uppercase text-slate-700 tracking-wider">{label}</p>
             <p className="text-2xl font-black text-slate-800 mt-1">{count}</p>
         </div>
     );
@@ -252,8 +252,8 @@ const StatusBadge = ({ status }) => {
 const Section = ({ title, icon, children }) => (
   <div className="space-y-3">
     <div className="flex items-center gap-2 px-1">
-        <span className="text-slate-400">{icon}</span>
-        <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-widest">{title}</h4>
+        <span className="text-slate-700">{icon}</span>
+        <h4 className="text-[11px] font-black uppercase text-slate-700 tracking-widest">{title}</h4>
     </div>
     {children}
   </div>

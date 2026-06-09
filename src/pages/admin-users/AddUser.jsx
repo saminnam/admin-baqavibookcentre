@@ -89,18 +89,18 @@ const AddUser = ({ onUserAdded }) => {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="p-6 min-h-screen">
+      <div className="">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#E5B236] to-[#d4a32e] p-8">
+          <div className="px-8 pt-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/20 rounded-xl text-white">
+              <div className="text-[#E5B236]">
                 <UserPlus size={32} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Add New User</h1>
-                <p className="text-white/80 mt-1">Create a new admin user account</p>
+                <h1 className="text-3xl font-black text-slate-800">Add New User</h1>
+                <p className="mt-1">Create a new admin user account</p>
               </div>
             </div>
           </div>

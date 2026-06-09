@@ -73,7 +73,7 @@ const ManageSellers = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-[#FBFBFD] min-h-screen font-sans">
+    <div className="p-6 min-h-screen">
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
@@ -114,8 +114,8 @@ const ManageSellers = () => {
       </div>
 
       {/* SEARCH BAR */}
-      <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-6 flex items-center px-4 focus-within:ring-2 ring-[#E5B236]/20 transition-all">
-        <Search className="text-slate-400 mr-3" size={20} />
+      <div className="bg-white p-2 rounded-3xl shadow-sm border border-slate-200 mb-6 flex items-center px-4 focus-within:ring-2 ring-[#E5B236]/20 transition-all">
+        <Search className="text-slate-700 mr-3" size={20} />
         <input
           type="text"
           placeholder="Search by Seller Name or Business..."
@@ -130,16 +130,16 @@ const ManageSellers = () => {
         <table className="w-full text-left">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-wider">
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 tracking-wider">
                 Business Info
               </th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-wider">
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-wider text-center">
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 tracking-wider text-center">
                 Category
               </th>
-              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-wider text-right">
+              <th className="px-6 py-4 text-[11px] font-black uppercase text-slate-700 tracking-wider text-right">
                 Actions
               </th>
             </tr>
@@ -154,7 +154,7 @@ const ManageSellers = () => {
                   <div className="font-bold text-slate-800">
                     {seller.businessName}
                   </div>
-                  <div className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">
+                  <div className="text-[10px] text-slate-700 font-black uppercase tracking-tighter">
                     {seller.businessType}
                   </div>
                 </td>
@@ -162,7 +162,7 @@ const ManageSellers = () => {
                   <div className="text-sm font-bold text-slate-700">
                     {seller.fullName}
                   </div>
-                  <div className="text-xs text-slate-400 font-medium italic">
+                  <div className="text-xs text-slate-700 font-medium italic">
                     {seller.email}
                   </div>
                 </td>
@@ -185,7 +185,7 @@ const ManageSellers = () => {
                       className={`px-3 py-1 rounded-full text-[10px] font-black uppercase cursor-pointer transition-all ${
                         seller.isVerified
                           ? "bg-green-100 text-green-600 border border-green-200"
-                          : "bg-slate-100 text-slate-400 border border-slate-200"
+                          : "bg-slate-100 text-slate-700 border border-slate-200"
                       }`}
                     >
                       {seller.isVerified ? "✓ Verified" : "Pending"}
@@ -205,7 +205,7 @@ const ManageSellers = () => {
               <tr>
                 <td
                   colSpan="4"
-                  className="text-center py-10 text-slate-400 text-sm italic"
+                  className="text-center py-10 text-slate-700 text-sm italic"
                 >
                   No sellers found...
                 </td>
@@ -229,14 +229,14 @@ const ManageSellers = () => {
                   <h2 className="font-black text-2xl text-slate-800 uppercase">
                     {selectedSeller.businessName}
                   </h2>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">
+                  <p className="text-slate-700 text-xs font-bold uppercase tracking-widest">
                     Seller Profile Details
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedSeller(null)}
-                className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 cursor-pointer"
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700 cursor-pointer"
               >
                 <X size={24} />
               </button>
@@ -350,7 +350,7 @@ const StatCard = ({ label, count, color, icon }) => {
       className={`p-6 bg-white rounded-3xl border shadow-sm border-l-4 ${themes[color]}`}
     >
       <div className="flex justify-between items-start mb-2">
-        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+        <p className="text-[10px] font-black uppercase text-slate-700 tracking-wider">
           {label}
         </p>
         <span className="text-slate-300">{icon}</span>
@@ -363,7 +363,7 @@ const StatCard = ({ label, count, color, icon }) => {
 const SectionHeader = ({ title, icon }) => (
   <div className="flex items-center gap-2 px-1">
     <span className="text-[#E5B236]">{icon}</span>
-    <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-widest">
+    <h4 className="text-[11px] font-black uppercase text-slate-700 tracking-widest">
       {title}
     </h4>
   </div>
@@ -371,7 +371,7 @@ const SectionHeader = ({ title, icon }) => (
 
 const DetailRow = ({ label, value, icon }) => (
   <div className="flex flex-col gap-1">
-    <span className="text-[10px] text-slate-400 font-bold uppercase">
+    <span className="text-[10px] text-slate-700 font-bold uppercase">
       {label}
     </span>
     <div className="flex items-center gap-2 text-sm font-bold text-slate-700">

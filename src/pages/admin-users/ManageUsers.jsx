@@ -113,7 +113,7 @@ const ManageUsers = () => {
 
       {/* Search */}
       <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center px-4 focus-within:ring-2 ring-[#E5B236]/20 transition-all mb-6">
-        <Search className="text-slate-400 mr-3" size={20} />
+        <Search className="text-slate-700 mr-3" size={20} />
         <input
           type="text"
           placeholder="Search by name, email or phone..."
@@ -126,7 +126,7 @@ const ManageUsers = () => {
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+          <div className="flex flex-col items-center justify-center py-32 text-slate-700">
             <Loader2 className="animate-spin mb-4" size={48} />
             <p className="font-medium animate-pulse">Loading users...</p>
           </div>
@@ -135,10 +135,10 @@ const ManageUsers = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider">User Info</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider">Contact</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">Status</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider">User Info</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider">Contact</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider text-center">Status</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-700 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -154,7 +154,7 @@ const ManageUsers = () => {
                         </div>
                         <div>
                           <div className="font-bold text-slate-800">{user.name}</div>
-                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-tighter flex items-center gap-1">
+                          <div className="text-[10px] text-slate-700 font-black uppercase tracking-tighter flex items-center gap-1">
                             <Shield size={10} /> {user.role?.name || 'admin'}
                           </div>
                         </div>
@@ -162,9 +162,9 @@ const ManageUsers = () => {
                     </td>
                     <td className="px-8 py-4">
                       <div className="text-sm font-bold text-slate-700 flex items-center gap-1">
-                        <Mail size={12} className="text-slate-400" /> {user.email}
+                        <Mail size={12} className="text-slate-700" /> {user.email}
                       </div>
-                      <div className="text-xs text-slate-400 font-medium italic flex items-center gap-1 mt-1">
+                      <div className="text-xs text-slate-700 font-medium italic flex items-center gap-1 mt-1">
                         <Phone size={12} /> {user.phone || "N/A"}
                       </div>
                     </td>
@@ -236,10 +236,10 @@ const ManageUsers = () => {
                 </div>
                 <div>
                   <h2 className="font-black text-2xl text-slate-800">{selectedUser.name}</h2>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">User Details</p>
+                  <p className="text-slate-700 text-xs font-bold uppercase tracking-widest">User Details</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+              <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
                 <X size={24} />
               </button>
             </div>
@@ -249,7 +249,7 @@ const ManageUsers = () => {
               <DetailRow label="Role" value={selectedUser.role?.name || "admin"} icon={<Shield size={16}/>} />
               <DetailRow label="Status" value={selectedUser.status || "active"} icon={selectedUser.status === "active" ? <CheckCircle size={16}/> : <XCircle size={16}/>} />
               <div className="p-3 bg-slate-50 rounded-xl">
-                <div className="text-[10px] text-slate-400 font-bold uppercase mb-2">Permissions</div>
+                <div className="text-[10px] text-slate-700 font-bold uppercase mb-2">Permissions</div>
                 <div className="flex flex-wrap gap-2">
                   {selectedUser.role?.permissions && selectedUser.role.permissions.length > 0 ? (
                     selectedUser.role.permissions.map((permission) => (
@@ -281,10 +281,10 @@ const ManageUsers = () => {
                 </div>
                 <div>
                   <h2 className="font-black text-2xl text-slate-800">Edit User</h2>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Update user details</p>
+                  <p className="text-slate-700 text-xs font-bold uppercase tracking-widest">Update user details</p>
                 </div>
               </div>
-              <button onClick={() => setEditingUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+              <button onClick={() => setEditingUser(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
                 <X size={24} />
               </button>
             </div>
@@ -372,7 +372,7 @@ const StatCard = ({ label, count, icon, color }) => {
         {icon}
       </div>
       <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">{label}</p>
         <p className="text-3xl font-black text-slate-800 leading-none mt-1">{count}</p>
       </div>
     </div>
@@ -383,7 +383,7 @@ const DetailRow = ({ label, value, icon }) => (
   <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
     <div className="text-[#E5B236]">{icon}</div>
     <div>
-      <div className="text-[10px] text-slate-400 font-bold uppercase">{label}</div>
+      <div className="text-[10px] text-slate-700 font-bold uppercase">{label}</div>
       <div className="text-sm font-bold text-slate-700">{value}</div>
     </div>
   </div>

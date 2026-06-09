@@ -1,2 +1,68 @@
 @import "tailwindcss";
 /* @import "./node_modules/preline/variants.css"; */
+
+:root {
+  color-scheme: light;
+}
+
+button,
+[role="button"],
+a[href],
+label,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.clickable,
+.icon-button,
+.interactive {
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease,
+    color 180ms ease, filter 180ms ease;
+}
+
+button:hover,
+[role="button"]:hover,
+a[href]:hover,
+label:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+.clickable:hover,
+.icon-button:hover,
+.interactive:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+
+button:active,
+[role="button"]:active,
+a[href]:active,
+label:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active,
+.clickable:active,
+.icon-button:active,
+.interactive:active {
+  transform: translateY(0) scale(0.98);
+}
+
+button svg,
+[role="button"] svg,
+a[href] svg,
+label svg,
+.clickable svg,
+.icon-button svg,
+.interactive svg {
+  transition: transform 180ms ease, color 180ms ease, filter 180ms ease;
+}
+
+button:hover svg,
+[role="button"]:hover svg,
+a[href]:hover svg,
+label:hover svg,
+.clickable:hover svg,
+.icon-button:hover svg,
+.interactive:hover svg {
+  transform: scale(1.08);
+}

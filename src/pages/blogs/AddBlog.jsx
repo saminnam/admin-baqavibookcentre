@@ -159,12 +159,12 @@ const AddBlog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
+    <div className="min-h-scree p-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* LEFT SIDE: THE FORM */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100">
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-200">
           <h2 className="text-3xl font-black text-slate-800 mb-8 flex items-center gap-2">
-            <PenLine className="text-blue-600" /> Add New Blog
+            <PenLine className="text-[#E5B234]" /> Add New Blog
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -175,7 +175,7 @@ const AddBlog = () => {
               </label>
               <div className="relative">
                 <Type
-                  className="absolute left-3 top-3.5 text-slate-400"
+                  className="absolute left-3 top-3.5 text-slate-700"
                   size={18}
                 />
                 <input
@@ -198,7 +198,7 @@ const AddBlog = () => {
               </label>
               <div className="relative">
                 <AlignLeft
-                  className="absolute left-3 top-3.5 text-slate-400"
+                  className="absolute left-3 top-3.5 text-slate-700"
                   size={18}
                 />
                 <input
@@ -222,7 +222,7 @@ const AddBlog = () => {
                 </label>
                 <div className="relative">
                   <Tag
-                    className="absolute left-3 top-3.5 text-slate-400"
+                    className="absolute left-3 top-3.5 text-slate-700"
                     size={18}
                   />
                   <input
@@ -244,7 +244,7 @@ const AddBlog = () => {
                 </label>
                 <div className="relative">
                   <Clock
-                    className="absolute left-3 top-3.5 text-slate-400"
+                    className="absolute left-3 top-3.5 text-slate-700"
                     size={18}
                   />
                   <input
@@ -267,18 +267,18 @@ const AddBlog = () => {
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Featured Image
                 </label>
-                <div className="flex bg-white p-1 rounded-lg border text-[10px] font-bold">
+                <div className="flex bg-white p-1 rounded-lg border border-gray-300 text-[10px] font-bold">
                   <button
                     type="button"
                     onClick={() => setImageType("url")}
-                    className={`px-3 py-1 rounded ${imageType === "url" ? "bg-blue-600 text-white" : "text-slate-400"}`}
+                    className={`px-3 py-1 rounded ${imageType === "url" ? "bg-[#E5B234] text-white" : "text-slate-700"}`}
                   >
                     URL
                   </button>
                   <button
                     type="button"
                     onClick={() => setImageType("file")}
-                    className={`px-3 py-1 rounded ${imageType === "file" ? "bg-blue-600 text-white" : "text-slate-400"}`}
+                    className={`px-3 py-1 rounded ${imageType === "file" ? "bg-[#E5B234] text-white" : "text-slate-700"}`}
                   >
                     UPLOAD
                   </button>
@@ -287,7 +287,7 @@ const AddBlog = () => {
               {imageType === "url" ? (
                 <div className="relative">
                   <LinkIcon
-                    className="absolute left-3 top-3.5 text-slate-400"
+                    className="absolute left-3 top-3.5 text-slate-700"
                     size={18}
                   />
                   <input
@@ -300,7 +300,7 @@ const AddBlog = () => {
                 </div>
               ) : (
                 <label className="w-full flex flex-col items-center justify-center h-24 bg-white border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors">
-                  <Upload className="text-slate-400 mb-1" size={20} />
+                  <Upload className="text-slate-700 mb-1" size={20} />
                   <span className="text-xs text-slate-500 font-medium">
                     {selectedFile ? selectedFile.name : "Select from computer"}
                   </span>
@@ -325,14 +325,14 @@ const AddBlog = () => {
                 <button
                   type="button"
                   onClick={handleSetToday}
-                  className="text-[10px] font-bold text-blue-600 hover:text-blue-800 uppercase tracking-tighter"
+                  className="text-[10px] font-bold text-[#E5B234] hover:text-blue-800 uppercase tracking-tighter"
                 >
                   Set Today
                 </button>
               </div>
               <div className="relative">
                 <Calendar
-                  className="absolute left-3 top-3.5 text-slate-400"
+                  className="absolute left-3 top-3.5 text-slate-700"
                   size={18}
                 />
                 <input
@@ -383,10 +383,10 @@ const AddBlog = () => {
         {/* RIGHT SIDE: THE PREVIEW */}
         <div className="hidden lg:block">
           <div className="sticky top-10 space-y-4">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest ml-4">
+            <p className="text-xs font-black text-slate-700 uppercase tracking-widest ml-4">
               Live Preview
             </p>
-            <div className="bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-slate-100 group">
+            <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-200 group">
               <div className="h-64 bg-slate-100 relative overflow-hidden">
                 {previewUrl ? (
                   <img
@@ -403,13 +403,13 @@ const AddBlog = () => {
                   </div>
                 )}
                 <div className="absolute top-5 left-5">
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-blue-600 shadow-sm uppercase tracking-tighter">
+                  <span className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-[#E5B234] shadow-sm uppercase tracking-tighter">
                     {form.category || "Category"}
                   </span>
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex items-center gap-4 text-[11px] font-bold text-slate-400 mb-4 uppercase">
+                <div className="flex items-center gap-4 text-[11px] font-bold text-slate-700 mb-4 uppercase">
                   <span className="flex items-center gap-1">
                     <Calendar size={12} /> {form.date || "Date"}
                   </span>
@@ -425,14 +425,14 @@ const AddBlog = () => {
                     "Your excerpt will appear here as a hook for readers..."}
                 </p>
                 <div className="pt-6 border-t border-slate-50 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-slate-400">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-slate-700">
                     <PenLine size={18} />
                   </div>
                   <div>
                     <p className="text-xs font-black text-slate-800">
                       New Author
                     </p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                    <p className="text-[10px] text-slate-700 font-bold uppercase tracking-tight">
                       Publisher
                     </p>
                   </div>
