@@ -11,6 +11,7 @@ import {
   Users,
   Layers,
   Globe,
+  Tag,
 } from "lucide-react";
 import logo from "../assets/logos/logo-bg.png";
 
@@ -65,6 +66,15 @@ const navItems = [
       },
     ],
     permission: "product-list",
+  },
+  {
+    icon: <Tag className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Category",
+    children: [
+      { label: "Add Category", link: "/add-category" },
+      { label: "Manage Category", link: "/manage-categories" },
+    ],
+    permission: "manage-categories",
   },
   {
     icon: <FileText className="text-2xl text-gray-600 dark:text-gray-400" />,

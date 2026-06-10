@@ -117,12 +117,15 @@ const MainContent = ({
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="relative border p-2 text-gray-500 text-xl border-gray-300 rounded cursor-pointer hover:bg-gray-100 transition-colors">
+          <button
+            onClick={() => navigate("/notifications")}
+            className="relative border p-2 text-gray-500 text-xl border-gray-300 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+          >
             <FaRegBell />
             {hasNotifications && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
             )}
-          </div>
+          </button>
           <div className="relative" ref={profileRef}>
             <button
               className="cursor-pointer relative bg-[#CEA94C] rounded-full z-10 block"

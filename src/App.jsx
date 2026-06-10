@@ -20,6 +20,9 @@ import ManageWebsiteUsers from "./pages/website-users/ManageWebsiteUsers";
 import RolesAndPermissions from "./pages/roles/RolesAndPermissions";
 import ManageHeroSlides from "./pages/hero-slides/ManageHeroSlides";
 import ManageOfferHeroSlides from "./pages/offer-hero-slides/ManageOfferHeroSlides";
+import AddCategory from "./pages/categories/AddCategory";
+import ManageCategories from "./pages/categories/ManageCategories";
+import NotificationsPage from "./pages/notifications/NotificationsPage";
 import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
@@ -140,6 +143,39 @@ const App = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <AddProduct />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <NotificationsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/add-category"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <AddCategory />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/manage-categories"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ManageCategories />
               </DashboardLayout>
             </ProtectedRoute>
           }

@@ -21,7 +21,6 @@ const AddProduct = () => {
     name: "",
     slug: "",
     image: "",
-    categoryImage: "",
     images: [],
     mrp: "",
     price: "",
@@ -32,9 +31,7 @@ const AddProduct = () => {
     desc: "",
     productDetails: "",
     author: "",
-    publisher: "",
     rating: "",
-    releasedDate: "",
   });
 
   const [galleryInput, setGalleryInput] = useState("");
@@ -134,7 +131,6 @@ const AddProduct = () => {
         name: "",
         slug: "",
         image: "",
-        categoryImage: "",
         images: [],
         mrp: "",
         price: "",
@@ -145,9 +141,7 @@ const AddProduct = () => {
         desc: "",
         productDetails: "",
         author: "",
-        publisher: "",
         rating: "",
-        releasedDate: "",
       });
 
       // 🟢 3. Optional: Clear local gallery input state
@@ -284,7 +278,7 @@ const AddProduct = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Category
@@ -309,18 +303,6 @@ const AddProduct = () => {
                   placeholder="Brand..."
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Publisher
-                </label>
-                <input
-                  name="publisher"
-                  value={formData.publisher}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
-                  placeholder="Publisher..."
-                />
-              </div>
             </div>
           </div>
 
@@ -329,18 +311,12 @@ const AddProduct = () => {
             <h2 className="text-lg font-bold flex items-center gap-2">
               <ImageIcon size={20} className="text-[#E5B234]" /> Media & Gallery
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
               <ImageUploadBox
                 label="Main Product Image"
                 name="image"
                 value={formData.image}
                 sectionKey="main"
-              />
-              <ImageUploadBox
-                label="Category Icon/Image"
-                name="categoryImage"
-                value={formData.categoryImage}
-                sectionKey="category"
               />
             </div>
 
@@ -397,7 +373,7 @@ const AddProduct = () => {
                 {formData.images.map((img, index) => (
                   <div
                     key={index}
-                    className="relative group w-20 h-20 rounded-xl overflow-hidden border"
+                    className="relative group w-20 h-20 rounded-xl overflow-hidden border border-slate-200"
                   >
                     <img
                       src={img}
@@ -530,18 +506,6 @@ const AddProduct = () => {
                   <option value="active">Visible</option>
                   <option value="inactive">Hidden</option>
                 </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Release Date
-                </label>
-                <input
-                  name="releasedDate"
-                  type="date"
-                  value={formData.releasedDate}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 text-slate-900 focus:ring-2 focus:ring-indigo-500"
-                />
               </div>
             </div>
           </div>

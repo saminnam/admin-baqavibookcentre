@@ -38,10 +38,10 @@ const ManageHeroSlides = () => {
     e.preventDefault();
     try {
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/${currentSlide._id}`, currentSlide);
+        await axios.put(`${API_BASE_URL}/hero-slides/${currentSlide._id}`, currentSlide);
         toast.success("Hero slide updated successfully");
       } else {
-        await axios.post(API_BASE_URL, currentSlide);
+        await axios.post(`${API_BASE_URL}/hero-slides`, currentSlide);
         toast.success("Hero slide added successfully");
       }
       setIsModalOpen(false);
@@ -61,7 +61,7 @@ const ManageHeroSlides = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this slide?")) {
       try {
-        await axios.delete(`${API_BASE_URL}/${id}`);
+        await axios.delete(`${API_BASE_URL}/hero-slides/${id}`);
         toast.success("Hero slide deleted successfully");
         fetchSlides();
       } catch (error) {
