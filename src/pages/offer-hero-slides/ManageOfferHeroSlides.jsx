@@ -38,12 +38,13 @@ const ManageOfferHeroSlides = () => {
     e.preventDefault();
     try {
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/${currentSlide._id}`, currentSlide);
+        await axios.put(`${API_BASE_URL}/offer-hero-slides/${currentSlide._id}`, currentSlide);
         toast.success("Offer hero slide updated successfully");
       } else {
-        await axios.post(API_BASE_URL, currentSlide);
+        await axios.post(`${API_BASE_URL}/offer-hero-slides`, currentSlide);
         toast.success("Offer hero slide added successfully");
       }
+
       setIsModalOpen(false);
       fetchSlides();
       resetForm();

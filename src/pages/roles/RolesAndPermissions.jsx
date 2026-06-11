@@ -5,15 +5,44 @@ import { API_BASE_URL } from "../../components/Api";
 
 const availablePermissions = [
   { id: "dashboard", label: "Dashboard" },
+
+  // System Users
   { id: "user-list", label: "User Management" },
   { id: "add-user", label: "Add User" },
+
+  // Roles
+  { id: "manage-roles", label: "Manage Roles" },
+
+  // Products
   { id: "product-list", label: "Product List" },
   { id: "add-product", label: "Add Product" },
+
+  // Orders
   { id: "order-list", label: "Order Management" },
+
+  // Sellers & Enquiries
   { id: "manage-sellers", label: "Seller Management" },
   { id: "manage-enquires", label: "Enquiry Management" },
+
+  // Blogs
   { id: "blog-list", label: "Blog Management" },
   { id: "add-blog", label: "Add Blog" },
+
+  // Categories
+  { id: "manage-categories", label: "Manage Categories" },
+  { id: "add-category", label: "Add Category" },
+
+  // Hero Slides
+  { id: "manage-hero-slides", label: "Manage Hero Slides" },
+  { id: "manage-offer-hero-slides", label: "Manage Offer Hero Slides" },
+
+  // Notifications
+  { id: "notifications", label: "Notifications" },
+
+  // Contacts
+  { id: "add-contact", label: "Add Contact" },
+
+  // Website Users
   { id: "website-users", label: "Website Users" },
 ];
 
