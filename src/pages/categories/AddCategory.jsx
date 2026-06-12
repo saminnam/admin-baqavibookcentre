@@ -199,16 +199,13 @@ const AddCategory = () => {
         onSubmit={handleSubmit}
         className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6"
       >
-        <div className="space-y-4">
+            <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
-              Category Name
-            </label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. Books"
+              placeholder="Category name"
               className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -226,6 +223,7 @@ const AddCategory = () => {
             />
           </div>
         </div>
+
 
         <button
           type="submit"

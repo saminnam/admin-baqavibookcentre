@@ -27,6 +27,7 @@ const AddProduct = () => {
     discount: "",
     stock: "",
     status: "active",
+    // recommended: store category _id
     category: "",
     desc: "",
     productDetails: "",
@@ -34,7 +35,11 @@ const AddProduct = () => {
     rating: "",
   });
 
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+
   const [galleryInput, setGalleryInput] = useState("");
+
   const [sourceType, setSourceType] = useState({
     main: "url",
     category: "url",
@@ -79,6 +84,24 @@ const AddProduct = () => {
   };
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const res = await axios.get(`${API_BASE_URL}/categories`);
+        setCategories(res.data || []);
+      } catch {
+        toast.error("Unable to load categories");
+      } finally {
+
+        setCategoriesLoading(false);
+      }
+    };
+
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     const mrpVal = parseFloat(formData.mrp) || 0;
     const discountVal = parseFloat(formData.discount) || 0;
     if (mrpVal > 0) {
@@ -86,6 +109,7 @@ const AddProduct = () => {
       setFormData((prev) => ({ ...prev, price: Math.round(calculatedPrice) }));
     }
   }, [formData.mrp, formData.discount]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -283,14 +307,25 @@ const AddProduct = () => {
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Category
                 </label>
-                <input
+
+                <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
-                  placeholder="Category..."
-                />
+                  className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 bg-white"
+                >
+                  <option value="" disabled>
+                    {categoriesLoading ? "Loading categories..." : "Select category"}
+                  </option>
+
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Author/Brand
@@ -451,14 +486,15 @@ const AddProduct = () => {
                 />
               </div>
             </div>
-            <div className="p-4 border border-slate-200 rounded-2xl">
+              <div className="p-4 border border-slate-200 rounded-2xl">
               <label className="text-[10px] font-bold uppercase block mb-1">
                 Selling Price
               </label>
               <span className="text-2xl font-black">
-                ₹{formData.price || 0}
+                ₹{Number(formData.price || 0).toLocaleString("en-IN")}
               </span>
             </div>
+
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-700 uppercase">
                 Stock Level

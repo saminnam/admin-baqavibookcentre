@@ -22,9 +22,10 @@ const ManageCategories = () => {
       setLoading(true);
       const res = await axios.get(`${API_BASE_URL}/categories`);
       setCategories(res.data || []);
-    } catch (error) {
+    } catch {
       toast.error("Unable to load categories");
     } finally {
+
       setLoading(false);
     }
   };
@@ -106,12 +107,24 @@ const ManageCategories = () => {
                 key={category._id}
                 className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
               >
-                <div>
-                  <h3 className="font-semibold text-slate-900">{category.name}</h3>
-                  <p className="text-sm text-slate-500">{category.description || "No description provided"}</p>
+                <div className="flex items-center gap-3">
+                  {category.image ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_BASE_URL || ""}/uploads/${category.image}`}
+                      alt={category.name}
+                      className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200" />
+                  )}
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{category.name}</h3>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
+
+                  <div className="flex items-center gap-2">
+                    <button
+
                     onClick={() => openEdit(category)}
                     className="flex items-center gap-2 rounded-lg border border-amber-200 px-3 py-2 text-sm text-amber-700 transition hover:bg-amber-50"
                     title="Edit Category"
