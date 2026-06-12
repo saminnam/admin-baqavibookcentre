@@ -27,7 +27,7 @@ const AddProduct = () => {
     discount: "",
     stock: "",
     status: "active",
-    // recommended: store category _id
+    // store category name (for website filtering)
     category: "",
     desc: "",
     productDetails: "",
