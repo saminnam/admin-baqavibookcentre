@@ -13,9 +13,35 @@ const ManageCategories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [editForm, setEditForm] = useState({
     name: "",
-    description: "",
   });
+
+
+  const [imageMode, setImageMode] = useState("upload"); // "upload" | "url"
   const [editImageFile, setEditImageFile] = useState(null);
+  const [editImageUrl, setEditImageUrl] = useState("");
+
+
+  const getCategoryImageUrl = (image) => {
+    if (!image) return "";
+    if (typeof image !== "string") return "";
+
+    // Absolute URL
+    if (image.startsWith("http://") || image.startsWith("https://")) return image;
+
+    // Base host (strip trailing /api if API_BASE_URL is something like http://host/api)
+    const baseUrl = API_BASE_URL.replace(/\/api\/?$/, "");
+
+    // Normalize any leading slashes: uploads/x -> uploads/x, /uploads/x -> uploads/x, etc.
+    const normalized = image.replace(/^\/+/, "");
+
+    // If backend ever stores a full relative path like uploads/<filename>
+    if (normalized.startsWith("uploads/")) {
+      return `${baseUrl}/${normalized}`;
+    }
+
+    // Otherwise treat it as a raw filename returned by multer (e.g. 12345.webp)
+    return `${baseUrl}/uploads/${normalized}`;
+  };
 
   const fetchCategories = async () => {
     try {
@@ -25,7 +51,6 @@ const ManageCategories = () => {
     } catch {
       toast.error("Unable to load categories");
     } finally {
-
       setLoading(false);
     }
   };
@@ -48,9 +73,15 @@ const ManageCategories = () => {
     setEditingCategory(category);
     setEditForm({
       name: category?.name || "",
-      description: category?.description || "",
     });
+
+
+    const isUrl = typeof category?.image === "string" && category.image.startsWith("http");
+    setImageMode(isUrl ? "url" : "upload");
+
     setEditImageFile(null);
+    setEditImageUrl(isUrl ? category.image : "");
+
     setIsEditOpen(true);
   };
 
@@ -58,6 +89,8 @@ const ManageCategories = () => {
     setIsEditOpen(false);
     setEditingCategory(null);
     setEditImageFile(null);
+    setEditImageUrl("");
+    setImageMode("upload");
   };
 
   const handleEditSubmit = async (e) => {
@@ -67,11 +100,12 @@ const ManageCategories = () => {
     try {
       const payload = new FormData();
       payload.append("name", editForm.name);
-      payload.append("description", editForm.description || "");
 
-      // backend only updates image if file is provided
-      if (editImageFile) {
-        payload.append("image", editImageFile);
+
+      if (imageMode === "upload") {
+        if (editImageFile) payload.append("image", editImageFile);
+      } else {
+        if (editImageUrl.trim()) payload.append("imageUrl", editImageUrl.trim());
       }
 
       await axios.put(`${API_BASE_URL}/categories/${editingCategory._id}`, payload, {
@@ -110,7 +144,7 @@ const ManageCategories = () => {
                 <div className="flex items-center gap-3">
                   {category.image ? (
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL || ""}/uploads/${category.image}`}
+                      src={getCategoryImageUrl(category.image)}
                       alt={category.name}
                       className="w-12 h-12 rounded-lg object-cover border border-slate-200"
                     />
@@ -123,8 +157,7 @@ const ManageCategories = () => {
                 </div>
 
                   <div className="flex items-center gap-2">
-                    <button
-
+                  <button
                     onClick={() => openEdit(category)}
                     className="flex items-center gap-2 rounded-lg border border-amber-200 px-3 py-2 text-sm text-amber-700 transition hover:bg-amber-50"
                     title="Edit Category"
@@ -146,7 +179,7 @@ const ManageCategories = () => {
       </div>
 
       {isEditOpen && editingCategory && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -155,7 +188,8 @@ const ManageCategories = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-slate-800">Edit Category</h2>
-                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Update name / description / image</p>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Update name / image</p>
+
                 </div>
               </div>
               <button onClick={closeEdit} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
@@ -164,6 +198,7 @@ const ManageCategories = () => {
             </div>
 
             <form onSubmit={handleEditSubmit} className="p-6 space-y-5">
+              <div className="sr-only">{imageMode}{editImageUrl}</div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Name</label>
                 <input
@@ -174,28 +209,50 @@ const ManageCategories = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Description</label>
-                <textarea
-                  value={editForm.description}
-                  onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
-                  rows={4}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-[#E5B236] outline-none"
-                />
-              </div>
+
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Image (optional)</label>
-                <label className="w-full border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-amber-400 cursor-pointer transition">
-                  <UploadCloud size={18} className="text-slate-600" />
-                  <span className="text-xs text-slate-500 mt-2">Click to upload new image</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
-                  />
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">Image</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageMode((prev) => {
+                        const next = prev === "url" ? "upload" : "url";
+                        if (next === "upload") setEditImageUrl("");
+                        return next;
+                      });
+                      setEditImageFile(null);
+                      if (imageMode === "upload") setEditImageUrl(editingCategory?.image || "");
+                    }}
+                    className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+                    title="Toggle image source"
+                  >
+                    {imageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                  </button>
+                </div>
+
+                {imageMode === "url" ? (
+                  <div className="relative">
+                    <input
+                      value={editImageUrl}
+                      onChange={(e) => setEditImageUrl(e.target.value)}
+                      placeholder="Paste image URL here..."
+                      className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
+                    />
+                  </div>
+                ) : (
+                  <label className="w-full border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-amber-400 cursor-pointer transition">
+                    <UploadCloud size={18} className="text-slate-600" />
+                    <span className="text-xs text-slate-500 mt-2">Click to upload new image</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => setEditImageFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                )}
               </div>
 
               <div className="flex gap-3 pt-2">

@@ -8,10 +8,7 @@ import {
   Search,
   Save,
   X,
-  ImagePlus,
-  ImageIcon,
   UploadCloud,
-  Link as LinkIcon,
   AlertTriangle,
 } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
@@ -19,6 +16,10 @@ import { API_BASE_URL } from "../../components/Api";
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+
 
   // Modal States
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,7 +29,6 @@ const ManageProducts = () => {
   // Image Source Toggle for Modal
   const [editSourceType, setEditSourceType] = useState({
     main: "url",
-    category: "url",
     gallery: "url",
   });
 
@@ -39,7 +39,7 @@ const ManageProducts = () => {
       const { data } = await axios.get(`${API_BASE_URL}/products?limit=1000`);
       const productsData = data.products || data;
       setProducts(Array.isArray(productsData) ? productsData : []);
-    } catch (err) {
+    } catch (error) {
       toast.error("Failed to load products");
     }
   };
@@ -47,6 +47,23 @@ const ManageProducts = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const res = await axios.get(`${API_BASE_URL}/categories`);
+        setCategories(res.data || []);
+      } catch {
+        toast.error("Unable to load categories");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   // 🟢 Handle File to Base64 (Same as Add Product)
   const handleFileChange = (e, name) => {
@@ -86,7 +103,7 @@ const ManageProducts = () => {
         await axios.delete(`${API_BASE_URL}/products/${id}`);
         fetchProducts();
         toast.success("Product Deleted");
-      } catch (err) {
+      } catch {
         toast.error("Delete failed");
       }
     }
@@ -116,8 +133,8 @@ const ManageProducts = () => {
       toast.success("Product Updated Successfully!");
       setIsEditOpen(false);
       fetchProducts();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Update failed");
+    } catch {
+      toast.error("Update failed");
     }
   };
 
@@ -184,7 +201,7 @@ const ManageProducts = () => {
           <input
             type="text"
             placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-2.5 border bg-white border-gray-200 rounded-3xl focus:ring-2 focus:ring-yellow-500 outline-none bg-white shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-3xl focus:ring-2 focus:ring-yellow-500 outline-none bg-white shadow-sm"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
@@ -206,18 +223,33 @@ const ManageProducts = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredProducts.map((p) => (
-                <tr key={p._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="p-4 flex items-center gap-3">
-                    <img
-                      src={p.image}
-                      className="w-12 h-12 rounded-lg object-cover bg-gray-50"
-                      alt=""
-                    />
-                    <span className="font-semibold text-gray-700">
-                      {p.name}
-                    </span>
-                  </td>
+              {filteredProducts.map((p) => {
+                const isHidden = p?.status === "inactive";
+
+                return (
+                  <tr key={p._id} className={`hover:bg-gray-50 transition-colors ${isHidden ? "bg-slate-50/80" : ""}`}>
+                    <td className="p-4 flex items-center gap-3">
+                      <div className="relative">
+                        <img
+                          src={p.image}
+                          className={`w-12 h-12 rounded-lg object-cover bg-gray-50 ${isHidden ? "blur-[1px] opacity-70" : ""}`}
+                          alt=""
+                        />
+                        {isHidden && (
+                          <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-slate-900/55 px-2 text-[10px] font-bold text-white text-center">
+                            Hidden
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-700">{p.name}</span>
+                        {isHidden && (
+                          <span className="text-[11px] font-semibold text-amber-600 mt-1">
+                            Currently no available
+                          </span>
+                        )}
+                      </div>
+                    </td>
                   <td className="p-4 text-sm text-gray-600">{p.category}</td>
                   <td className="p-4 font-bold text-gray-800">₹{p.price}</td>
                   <td className="p-4">
@@ -260,7 +292,8 @@ const ManageProducts = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -313,13 +346,22 @@ const ManageProducts = () => {
                       <label className="text-xs font-bold text-gray-500 uppercase">
                         Category
                       </label>
-                      <input
+                      <select
                         name="category"
-                        value={selectedProduct.category}
+                        value={selectedProduct.category || ""}
                         onChange={handleEditChange}
                         className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-500"
                         required
-                      />
+                      >
+                        <option value="" disabled>
+                          {categoriesLoading ? "Loading categories..." : "Select category"}
+                        </option>
+                        {categories.map((cat) => (
+                          <option key={cat._id} value={cat.name}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
@@ -330,12 +372,7 @@ const ManageProducts = () => {
                       value={selectedProduct.image}
                       sectionKey="main"
                     />
-                    <EditImageInput
-                      label="Category Image"
-                      name="categoryImage"
-                      value={selectedProduct.categoryImage}
-                      sectionKey="category"
-                    />
+
                   </div>
 
                   <div className="space-y-1">
@@ -496,11 +533,11 @@ const ManageProducts = () => {
                     </h3>
                     <div>
                       <label className="text-xs font-bold text-gray-500">
-                        Author/Brand
+                        Brand
                       </label>
                       <input
-                        name="author"
-                        value={selectedProduct.author || ""}
+                        name="publisher"
+                        value={selectedProduct.publisher || ""}
                         onChange={handleEditChange}
                         className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
                       />
@@ -516,6 +553,35 @@ const ManageProducts = () => {
                         onChange={handleEditChange}
                         className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
                       />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-500">
+                        Rating
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        name="rating"
+                        value={selectedProduct.rating ?? 0}
+                        onChange={handleEditChange}
+                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-500">
+                        Status
+                      </label>
+                      <select
+                        name="status"
+                        value={selectedProduct.status || "active"}
+                        onChange={handleEditChange}
+                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
+                      >
+                        <option value="active">Visible</option>
+                        <option value="inactive">Hidden</option>
+                      </select>
                     </div>
                   </div>
                 </div>

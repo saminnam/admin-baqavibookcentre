@@ -18,7 +18,7 @@ const ManageOfferHeroSlides = () => {
 
   const fetchSlides = async () => {
     try {
-      const { data } = await axios.get(`${API_BASE_URL}/offer-hero-slides`);
+      const { data } = await axios.get(`${API_BASE_URL}/offerHero-slides`);
       setSlides(data);
     } catch {
       toast.error("Failed to fetch offer hero slides");
@@ -38,10 +38,10 @@ const ManageOfferHeroSlides = () => {
     e.preventDefault();
     try {
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/offer-hero-slides/${currentSlide._id}`, currentSlide);
+        await axios.put(`${API_BASE_URL}/offerHero-slides/${currentSlide._id}`, currentSlide);
         toast.success("Offer hero slide updated successfully");
       } else {
-        await axios.post(`${API_BASE_URL}/offer-hero-slides`, currentSlide);
+        await axios.post(`${API_BASE_URL}/offerHero-slides`, currentSlide);
         toast.success("Offer hero slide added successfully");
       }
 
@@ -62,7 +62,7 @@ const ManageOfferHeroSlides = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this slide?")) {
       try {
-        await axios.delete(`${API_BASE_URL}/${id}`);
+        await axios.delete(`${API_BASE_URL}/offerHero-slides/${id}`);
         toast.success("Offer hero slide deleted successfully");
         fetchSlides();
       } catch {

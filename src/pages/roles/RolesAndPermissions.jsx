@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { Shield, Plus, Edit, Trash2, CheckSquare, Square, Loader2 } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
@@ -68,20 +69,19 @@ const RolesAndPermissions = () => {
       setRoles(response.data);
     } catch (error) {
       console.error("Failed to fetch roles:", error);
+      toast.error("Failed to load roles");
     }
   };
 
   const handlePermissionToggle = (permissionId) => {
-    setFormData((prev) => ({
-      ...prev,
-      permissions: prev.permissions.includes(permissionId)
+    setFormData((prev) => {
+      const nextPermissions = prev.permissions.includes(permissionId)
         ? prev.permissions.filter((p) => p !== permissionId)
-        : [...prev.permissions, permissionId],
-    }));
-    const newPermissions = formData.permissions.includes(permissionId)
-      ? formData.permissions.filter((p) => p !== permissionId)
-      : [...formData.permissions, permissionId];
-    setSelectAll(newPermissions.length === availablePermissions.length);
+        : [...prev.permissions, permissionId];
+
+      setSelectAll(nextPermissions.length === availablePermissions.length);
+      return { ...prev, permissions: nextPermissions };
+    });
   };
 
   const handleSelectAll = () => {
@@ -103,18 +103,18 @@ const RolesAndPermissions = () => {
       if (editingRole) {
         const response = await axios.put(`${API_BASE_URL}/roles/${editingRole._id}`, formData);
         console.log("Update response:", response.data);
-        alert("Role updated successfully!");
+        toast.success("Role updated successfully!");
       } else {
         const response = await axios.post(`${API_BASE_URL}/roles`, formData);
         console.log("Create response:", response.data);
-        alert("Role created successfully!");
+        toast.success("Role created successfully!");
       }
       resetForm();
       fetchRoles();
     } catch (error) {
       console.error("Error saving role:", error);
       console.error("Error response:", error.response?.data);
-      alert(error.response?.data?.message || "Failed to save role.");
+      toast.error(error.response?.data?.message || "Failed to save role.");
     } finally {
       setLoading(false);
     }
@@ -135,10 +135,10 @@ const RolesAndPermissions = () => {
     if (!window.confirm("Are you sure you want to delete this role?")) return;
     try {
       await axios.delete(`${API_BASE_URL}/roles/${roleId}`);
-      alert("Role deleted successfully!");
+      toast.success("Role deleted successfully!");
       fetchRoles();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to delete role.");
+      toast.error(error.response?.data?.message || "Failed to delete role.");
     }
   };
 

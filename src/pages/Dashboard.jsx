@@ -195,7 +195,7 @@ const Dashboard = () => {
         )}
       </div>
       <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">{title}</h3>
-      <p className="text-3xl font-black text-slate-800">{value}</p>
+                      <p className="text-3xl font-black text-slate-800">{value}</p>
     </div>
   );
 
@@ -285,7 +285,7 @@ const Dashboard = () => {
         />
         <StatCard 
           title="Revenue" 
-          value={`$${stats.totalRevenue.toLocaleString()}`} 
+          value={`₹${stats.totalRevenue.toLocaleString()}`} 
           icon={<DollarSign size={24} className="text-white" />}
           color="bg-gradient-to-br from-[#E5B236] to-[#d4a32e]"
           trend="up"
@@ -358,7 +358,7 @@ const Dashboard = () => {
                       padding: 12,
                       displayColors: false,
                       callbacks: {
-                        label: (context) => `$${context.raw.toLocaleString()}`,
+                        label: (context) => `₹${context.raw.toLocaleString()}`,
                       },
                     },
                   },
@@ -369,7 +369,7 @@ const Dashboard = () => {
                         color: 'rgba(0, 0, 0, 0.05)',
                       },
                       ticks: {
-                        callback: (value) => `$${value.toLocaleString()}`,
+                        callback: (value) => `₹${value.toLocaleString()}`,
                         color: '#64748b',
                       },
                     },
@@ -416,7 +416,7 @@ const Dashboard = () => {
                 {recentOrders.length > 0 ? recentOrders.slice(0, 5).map((order, index) => (
                   <tr key={order._id || index} className="hover:bg-slate-50 transition">
                     <td className="px-4 py-3 text-sm font-bold text-slate-800">#{order._id?.slice(-6) || `ORD${index + 1}`}</td>
-                    <td className="px-4 py-3 text-sm font-bold text-slate-800">${order.totalAmount || 0}</td>
+                    <td className="px-4 py-3 text-sm font-bold text-slate-800">₹{order.totalAmount || 0}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 text-xs font-bold rounded-full bg-green-100 text-green-600">
                         {order.status || 'Completed'}
@@ -474,7 +474,7 @@ const Dashboard = () => {
             <DollarSign size={32} />
             <span className="text-sm font-bold bg-white/20 px-3 py-1 rounded-full">Today</span>
           </div>
-          <h3 className="text-3xl font-black mb-1">${stats.totalRevenue.toLocaleString()}</h3>
+          <h3 className="text-3xl font-black mb-1">₹{stats.totalRevenue.toLocaleString()}</h3>
           <p className="text-white/80 text-sm">Revenue Today</p>
         </div>
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
