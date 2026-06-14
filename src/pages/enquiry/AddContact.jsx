@@ -18,6 +18,7 @@ const AddContact = () => {
     whatsappChannel: "",
     youtube: ""
   });
+  const [errors, setErrors] = useState({});
 
   // Fetch data from API on load
   useEffect(() => {
@@ -41,6 +42,7 @@ const AddContact = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    setErrors({});
     try {
       const res = await axios.put(`${API_BASE_URL}/contact/info`, contactData);
       if (res.data.success) {
@@ -49,8 +51,14 @@ const AddContact = () => {
       }
     } catch (error) {
       console.error('Error saving contact info:', error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to update contact information";
-      alert(errorMessage);
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+        const errorMessage = error.response?.data?.message || "Please fix the validation errors";
+        alert(errorMessage);
+      } else {
+        const errorMessage = error.response?.data?.message || error.message || "Failed to update contact information";
+        alert(errorMessage);
+      }
     } finally {
       setSaving(false);
     }
@@ -97,10 +105,11 @@ const AddContact = () => {
                 disabled={!isEditing}
                 value={contactData.address}
                 onChange={handleChange}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition resize-none"
+                className={`w-full p-4 border-2 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition resize-none ${errors.address ? 'border-red-500' : 'border-gray-200'}`}
                 rows="3"
                 placeholder="Enter your physical address"
               />
+              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
             </div>
 
             {/* Basic Info */}
@@ -109,14 +118,15 @@ const AddContact = () => {
                 <Phone size={18} className="text-[#E5B236]" />
                 Phone Number
               </label>
-              <input 
+              <input
                 name="phone"
                 disabled={!isEditing}
                 value={contactData.phone}
                 onChange={handleChange}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition"
+                className={`w-full p-4 border-2 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition ${errors.phone ? 'border-red-500' : 'border-gray-200'}`}
                 placeholder="+91 74488 88336"
               />
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
             </div>
 
             <div className="space-y-3">
@@ -124,14 +134,15 @@ const AddContact = () => {
                 <Mail size={18} className="text-[#E5B236]" />
                 Email Address
               </label>
-              <input 
+              <input
                 name="email"
                 disabled={!isEditing}
                 value={contactData.email}
                 onChange={handleChange}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition"
+                className={`w-full p-4 border-2 rounded-xl disabled:bg-gray-50 disabled:border-gray-100 focus:border-[#E5B236] focus:ring-2 focus:ring-[#E5B236]/20 outline-none transition ${errors.email ? 'border-red-500' : 'border-gray-200'}`}
                 placeholder="baqavibookcentre@gmail.com"
               />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
             </div>
 
             {/* Links */}

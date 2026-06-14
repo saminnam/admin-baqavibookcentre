@@ -12,6 +12,8 @@ import {
   Layers,
   Globe,
   Tag,
+  ShoppingBasket,
+  UserKey
 } from "lucide-react";
 import logo from "../assets/logos/logo-bg.png";
 
@@ -51,7 +53,7 @@ const navItems = [
     permission: "order-list",
   },
   {
-    icon: <Layers className="text-2xl text-gray-600 dark:text-gray-400" />,
+    icon: <ShoppingBasket className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Products",
     children: [
       {
@@ -120,7 +122,7 @@ const navItems = [
     permission: "user-list",
   },
   {
-    icon: <Users className="text-2xl text-gray-600 dark:text-gray-400" />,
+    icon: <UserKey className="text-2xl text-gray-600 dark:text-gray-400" />,
     label: "Roles & Permission",
     children: [
       {
