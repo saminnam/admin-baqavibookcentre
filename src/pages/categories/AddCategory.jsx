@@ -199,7 +199,7 @@ const AddCategory = () => {
         onSubmit={handleSubmit}
         className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6"
       >
-            <div className="space-y-4">
+        <div className="space-y-4">
           <div>
             <input
               name="name"
@@ -224,7 +224,6 @@ const AddCategory = () => {
           </div>
         </div>
 
-
         <button
           type="submit"
           disabled={loading}
@@ -238,4 +237,3 @@ const AddCategory = () => {
 };
 
 export default AddCategory;
-

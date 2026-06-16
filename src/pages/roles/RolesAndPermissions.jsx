@@ -161,7 +161,7 @@ const RolesAndPermissions = () => {
                   <Shield size={32} />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-800">Roles & Permissions</h1>
+                  <h1 className="text-3xl font-extrabold text-slate-900">Roles & Permissions</h1>
                   <p className="text-slate-600 mt-1">Manage user roles and their access permissions</p>
                 </div>
               </div>

@@ -121,11 +121,11 @@ const ManageCategories = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen text-slate-900 font-sans">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Manage Categories</h1>
-          <p className="text-sm text-slate-500">Review, edit and remove categories shown on the website.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">Manage Categories</h1>
+          {/* <p className="text-sm text-slate-500">Review, edit and remove categories shown on the website.</p> */}
         </div>
       </div>
 

@@ -59,11 +59,12 @@ function Login() {
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[#E5B236] to-[#d4a32e] rounded-2xl shadow-lg mb-4">
-            <Shield size={40} className="text-white" />
+          <div className="inline-flex items-center justify-center mb-4">
+            {/* <Shield size={40} className="text-white" /> */}
+            <img src="src/assets/logos/logo-bg.png" alt="Logo-Gold" className="w-32" />
           </div>
-          <h1 className="text-3xl font-black text-slate-800 mb-2">Admin Portal</h1>
-          <p className="text-slate-500">Sign in to access the dashboard</p>
+          <h1 className="text-3xl font-black text-slate-800 mb-2">Welcome Back User</h1>
+          {/* <p className="text-slate-500">Sign in to access the dashboard</p> */}
         </div>
 
         {/* Login Card */}
@@ -139,16 +140,13 @@ function Login() {
             </button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-6 text-center text-sm text-slate-500">
-            <p>Protected by enterprise-grade security</p>
-          </div>
+
         </div>
 
         {/* Copyright */}
-        <div className="text-center mt-8 text-slate-700 text-sm">
+        {/* <div className="text-center mt-8 text-slate-700 text-sm">
           © 2024 Admin Panel. All rights reserved.
-        </div>
+        </div> */}
       </div>
     </div>
   );

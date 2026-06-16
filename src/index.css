@@ -5,6 +5,28 @@
   color-scheme: light;
 }
 
+/* Global scrollbar styling (Chrome/Edge/Safari) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #CEA94C transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #CEA94C;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+
 button,
 [role="button"],
 a[href],

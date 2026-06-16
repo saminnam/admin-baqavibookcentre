@@ -83,12 +83,12 @@ const ManageBlogs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] p-6 lg:p-12 text-slate-800">
+    <div className="p-6 min-h-screen text-slate-900 font-sans">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-3xl font-extrabold text-slate-900">
               Content Studio
             </h1>
             <p className="text-slate-500 font-medium">

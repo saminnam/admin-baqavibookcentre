@@ -229,7 +229,8 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
           </div>
         </div>
         <nav className="mt-5 px-2 text-[14px]">
-          <ul className="flex flex-col gap-2 max-w-[280px] mx-auto">
+          <ul
+            className="flex flex-col gap-2 max-w-[280px] mx-auto max-h-[calc(100vh-90px)] overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-[#CEA94C] scrollbar-track-transparent scrollbar-thumb-rounded">
             {filteredNavItems.map((item) => (
               <li key={item.label}>
                 <Link
