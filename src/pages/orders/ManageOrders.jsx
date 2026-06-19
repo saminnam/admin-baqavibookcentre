@@ -14,7 +14,7 @@ const ManageOrders = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/products?limit=1000`);
+      const res = await axios.get(`${API_BASE_URL}/products`);
       const productsData = res.data.products || res.data;
       const productMap = {};
       productsData.forEach((p) => {
