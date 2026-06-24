@@ -38,6 +38,7 @@ const Dashboard = () => {
     totalAdminUsers: 0,
     totalSellers: 0,
     totalRevenue: 0,
+    todayRevenue: 0,
     pendingEnquiries: 0
   });
   const [recentOrders, setRecentOrders] = useState([]);
@@ -74,6 +75,19 @@ const Dashboard = () => {
       const adminUsersRes = await axios.get(`${API_BASE_URL}/admin-users`);
       const adminUsers = adminUsersRes.data || [];
       
+      const now = new Date();
+      const todayStart = new Date(now);
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(now);
+      todayEnd.setHours(23, 59, 59, 999);
+
+      const todayRevenue = orders
+        .filter((order) => {
+          const orderDate = new Date(order.createdAt);
+          return orderDate >= todayStart && orderDate <= todayEnd;
+        })
+        .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
       setStats({
         totalOrders: orders.length,
         totalProducts: products.length,
@@ -81,6 +95,7 @@ const Dashboard = () => {
         totalAdminUsers: adminUsers.length,
         totalSellers: sellers.length,
         totalRevenue: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0),
+        todayRevenue,
         pendingEnquiries: enquiries.filter(e => !e.verified).length
       });
       
@@ -474,7 +489,9 @@ const Dashboard = () => {
             <DollarSign size={32} />
             <span className="text-sm font-bold bg-white/20 px-3 py-1 rounded-full">Today</span>
           </div>
-          <h3 className="text-3xl font-black mb-1">₹{stats.totalRevenue.toLocaleString()}</h3>
+          <h3 className="text-3xl font-black mb-1">
+            ₹{stats.todayRevenue?.toLocaleString?.() ?? stats.todayRevenue ?? 0}
+          </h3>
           <p className="text-white/80 text-sm">Revenue Today</p>
         </div>
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">

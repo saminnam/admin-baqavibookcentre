@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Lock, Mail, Eye, EyeOff, Shield, Loader2 } from "lucide-react";
 import { API_BASE_URL } from "../components/Api";
+import logo from "../assets/logos/logo-bg.png";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -61,7 +62,7 @@ function Login() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
             {/* <Shield size={40} className="text-white" /> */}
-            <img src="src/assets/logos/logo-bg.png" alt="Logo-Gold" className="w-32" />
+            <img src={logo} alt="Logo-Gold" className="w-32" />
           </div>
           <h1 className="text-3xl font-black text-slate-800 mb-2">Welcome Back User</h1>
           {/* <p className="text-slate-500">Sign in to access the dashboard</p> */}
