@@ -230,6 +230,7 @@ const ManageHeroSlides = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   placeholder="https://example.com/image.jpg"
                 />
+                <span className="text-sm font-semibold text-gray-400">Dimension: 1500x650</span>
                 {currentSlide.desktopImg && (
                   <img
                     src={currentSlide.desktopImg}
@@ -252,6 +253,7 @@ const ManageHeroSlides = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   placeholder="https://example.com/mobile-image.jpg"
                 />
+                <span className="text-sm font-semibold text-gray-400">Dimension: 600x300</span>
                 {currentSlide.mobileImg && (
                   <img
                     src={currentSlide.mobileImg}

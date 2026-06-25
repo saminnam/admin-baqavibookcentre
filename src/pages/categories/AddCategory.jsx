@@ -221,6 +221,7 @@ const AddCategory = () => {
               value={formData.image}
               sectionKey="main"
             />
+            <span className="text-sm font-semibold text-gray-400">Image Dimension: 250x250</span>
           </div>
         </div>
 

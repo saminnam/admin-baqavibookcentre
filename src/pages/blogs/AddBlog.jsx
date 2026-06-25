@@ -310,10 +310,12 @@ const AddBlog = () => {
                     onChange={handleFileChange}
                   />
                 </label>
+                
               )}
               {errors.image && (
                 <p className="text-red-500 text-xs mt-1">{errors.image}</p>
               )}
+              <span className="mt-2 text-sm font-semibold text-gray-400">Dimension: 500x400</span>
             </div>
 
             {/* Date Input */}

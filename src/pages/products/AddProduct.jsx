@@ -92,11 +92,9 @@ const AddProduct = () => {
       } catch {
         toast.error("Unable to load categories");
       } finally {
-
         setCategoriesLoading(false);
       }
     };
-
 
     fetchCategories();
   }, []);
@@ -109,7 +107,6 @@ const AddProduct = () => {
       setFormData((prev) => ({ ...prev, price: Math.round(calculatedPrice) }));
     }
   }, [formData.mrp, formData.discount]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -315,7 +312,9 @@ const AddProduct = () => {
                   className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 bg-white"
                 >
                   <option value="" disabled>
-                    {categoriesLoading ? "Loading categories..." : "Select category"}
+                    {categoriesLoading
+                      ? "Loading categories..."
+                      : "Select category"}
                   </option>
 
                   {categories.map((cat) => (
@@ -426,6 +425,9 @@ const AddProduct = () => {
                 ))}
               </div>
             </div>
+            <span className="text-sm font-semibold text-gray-400">
+            Note: Image Dimension - 650x700
+            </span>
           </div>
 
           {/* Description Section */}
@@ -486,7 +488,7 @@ const AddProduct = () => {
                 />
               </div>
             </div>
-              <div className="p-4 border border-slate-200 rounded-2xl">
+            <div className="p-4 border border-slate-200 rounded-2xl">
               <label className="text-[10px] font-bold uppercase block mb-1">
                 Selling Price
               </label>
