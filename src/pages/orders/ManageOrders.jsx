@@ -3,12 +3,15 @@ import axios from "axios";
 import {
   Package, Search, Eye, Trash2, CheckCircle, Truck, Clock, X, Mail, MapPin, Phone, User, Ban
 } from "lucide-react";
+
 import { API_BASE_URL } from "../../components/Api";
+
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState({});
-  const [loading, setLoading] = useState(true);
+  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -28,13 +31,26 @@ const ManageOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      setLoading(true);
       const res = await axios.get(`${API_BASE_URL}/orders`);
       setOrders(res.data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+
+  const deleteOrder = async (orderId) => {
+    try {
+      const ok = window.confirm("Are you sure you want to delete this order? This action cannot be undone.");
+      if (!ok) return;
+
+      await axios.delete(`${API_BASE_URL}/orders/${orderId}`);
+      await fetchOrders();
+      if (selectedOrder && selectedOrder._id === orderId) setSelectedOrder(null);
+      alert("Order deleted successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Order deletion failed");
     }
   };
 
@@ -47,9 +63,12 @@ const ManageOrders = () => {
       if (selectedOrder) setSelectedOrder(null);
       alert(`Order updated to ${newStatus} and email notification sent!`);
     } catch (error) {
+      console.error(error);
       alert("Status update failed");
     }
-  };
+
+  }; 
+
 
   useEffect(() => {
     fetchProducts();
@@ -121,13 +140,25 @@ const ManageOrders = () => {
                   <StatusBadge status={order.status} />
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => setSelectedOrder(order)}
-                    className="p-2 bg-slate-100 text-slate-600 hover:bg-[#E5B236] hover:text-white rounded-xl transition-all"
-                  >
-                    <Eye size={18} />
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="p-2 bg-slate-100 text-slate-600 hover:bg-[#E5B236] hover:text-white rounded-xl transition-all"
+                      aria-label="View order"
+                    >
+                      <Eye size={18} />
+                    </button>
+                    <button
+                      onClick={() => deleteOrder(order._id)}
+                      className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all"
+                      aria-label="Delete order"
+                      title="Delete order"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
+
               </tr>
             ))}
           </tbody>
