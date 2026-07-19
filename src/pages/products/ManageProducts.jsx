@@ -542,18 +542,6 @@ const ManageProducts = () => {
                         className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
                       />
                     </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500">
-                        Release Date
-                      </label>
-                      <input
-                        type="date"
-                        name="releasedDate"
-                        value={selectedProduct.releasedDate || ""}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
-                      />
-                    </div>
 
                     <div>
                       <label className="text-xs font-bold text-gray-500">
