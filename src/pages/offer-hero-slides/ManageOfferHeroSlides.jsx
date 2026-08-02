@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Trash2, Edit3, Plus, Image as ImageIcon } from "lucide-react";
+import { Trash2, Edit3, Plus, Image as ImageIcon, Link as LinkIcon, UploadCloud, X } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const ManageOfferHeroSlides = () => {
   const [slides, setSlides] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [imageMode, setImageMode] = useState("upload");
+  const [imageFile, setImageFile] = useState(null);
   const [currentSlide, setCurrentSlide] = useState({
     title: "",
     subTitle: "",
@@ -34,14 +36,46 @@ const ManageOfferHeroSlides = () => {
     setCurrentSlide((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCurrentSlide((prev) => ({ ...prev, img: reader.result }));
+      toast.success("Image loaded");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append("title", currentSlide.title);
+      formData.append("subTitle", currentSlide.subTitle);
+      formData.append("order", currentSlide.order);
+      formData.append("status", currentSlide.status);
+
+      if (imageMode === "upload") {
+        if (imageFile) {
+          formData.append("img", imageFile);
+        } else if (currentSlide.img && !currentSlide.img.startsWith("data:")) {
+          formData.append("img", currentSlide.img);
+        }
+      } else {
+        formData.append("img", currentSlide.img);
+      }
+
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/offerHero-slides/${currentSlide._id}`, currentSlide);
+        await axios.put(`${API_BASE_URL}/offerHero-slides/${currentSlide._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Offer hero slide updated successfully");
       } else {
-        await axios.post(`${API_BASE_URL}/offerHero-slides`, currentSlide);
+        await axios.post(`${API_BASE_URL}/offerHero-slides`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Offer hero slide added successfully");
       }
 
@@ -79,6 +113,8 @@ const ManageOfferHeroSlides = () => {
       order: 0,
       status: "active",
     });
+    setImageFile(null);
+    setImageMode("upload");
     setIsEditMode(false);
   };
 
@@ -229,25 +265,65 @@ const ManageOfferHeroSlides = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  name="img"
-                  value={currentSlide.img}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Image
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setImageMode(imageMode === "url" ? "upload" : "url")}
+                    className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+                  >
+                    {imageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                  </button>
+                </div>
+                {imageMode === "url" ? (
+                  <div className="relative">
+                    <LinkIcon
+                      size={16}
+                      className="absolute left-3 top-3.5 text-slate-700"
+                    />
+                    <input
+                      type="url"
+                      name="img"
+                      value={currentSlide.img}
+                      onChange={handleInputChange}
+                      required={!imageFile}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+                    <UploadCloud className="text-slate-700 mb-1" size={24} />
+                    <span className="text-xs text-slate-500">Click to select</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                )}
                 <span className="text-sm font-semibold text-gray-400">Dimension: 300x300</span>
                 {currentSlide.img && (
-                  <img
-                    src={currentSlide.img}
-                    alt="Preview"
-                    className="mt-2 h-32 w-full object-cover rounded"
-                  />
+                  <div className="relative mt-2">
+                    <img
+                      src={currentSlide.img}
+                      alt="Preview"
+                      className="h-32 w-full object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentSlide((prev) => ({ ...prev, img: "" }));
+                        setImageFile(null);
+                      }}
+                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 )}
               </div>
 

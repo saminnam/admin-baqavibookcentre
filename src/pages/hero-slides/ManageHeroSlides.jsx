@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Trash2, Edit3, Plus, Image as ImageIcon } from "lucide-react";
+import { Trash2, Edit3, Plus, Image as ImageIcon, Link as LinkIcon, UploadCloud, X } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const ManageHeroSlides = () => {
   const [slides, setSlides] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [desktopImageMode, setDesktopImageMode] = useState("upload");
+  const [mobileImageMode, setMobileImageMode] = useState("upload");
+  const [desktopImageFile, setDesktopImageFile] = useState(null);
+  const [mobileImageFile, setMobileImageFile] = useState(null);
   const [currentSlide, setCurrentSlide] = useState({
     title: "",
     desktopImg: "",
@@ -34,14 +38,67 @@ const ManageHeroSlides = () => {
     setCurrentSlide((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleDesktopFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setDesktopImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCurrentSlide((prev) => ({ ...prev, desktopImg: reader.result }));
+      toast.success("Desktop image loaded");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleMobileFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMobileImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCurrentSlide((prev) => ({ ...prev, mobileImg: reader.result }));
+      toast.success("Mobile image loaded");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append("title", currentSlide.title);
+      formData.append("order", currentSlide.order);
+      formData.append("status", currentSlide.status);
+
+      if (desktopImageMode === "upload") {
+        if (desktopImageFile) {
+          formData.append("desktopImg", desktopImageFile);
+        } else if (currentSlide.desktopImg && !currentSlide.desktopImg.startsWith("data:")) {
+          formData.append("desktopImg", currentSlide.desktopImg);
+        }
+      } else {
+        formData.append("desktopImg", currentSlide.desktopImg);
+      }
+
+      if (mobileImageMode === "upload") {
+        if (mobileImageFile) {
+          formData.append("mobileImg", mobileImageFile);
+        } else if (currentSlide.mobileImg && !currentSlide.mobileImg.startsWith("data:")) {
+          formData.append("mobileImg", currentSlide.mobileImg);
+        }
+      } else {
+        formData.append("mobileImg", currentSlide.mobileImg);
+      }
+
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/hero-slides/${currentSlide._id}`, currentSlide);
+        await axios.put(`${API_BASE_URL}/hero-slides/${currentSlide._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Hero slide updated successfully");
       } else {
-        await axios.post(`${API_BASE_URL}/hero-slides`, currentSlide);
+        await axios.post(`${API_BASE_URL}/hero-slides`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Hero slide added successfully");
       }
       setIsModalOpen(false);
@@ -78,6 +135,10 @@ const ManageHeroSlides = () => {
       order: 0,
       status: "active",
     });
+    setDesktopImageFile(null);
+    setMobileImageFile(null);
+    setDesktopImageMode("upload");
+    setMobileImageMode("upload");
     setIsEditMode(false);
   };
 
@@ -218,48 +279,128 @@ const ManageHeroSlides = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Desktop Image URL
-                </label>
-                <input
-                  type="url"
-                  name="desktopImg"
-                  value={currentSlide.desktopImg}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Desktop Image
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setDesktopImageMode(desktopImageMode === "url" ? "upload" : "url")}
+                    className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+                  >
+                    {desktopImageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                  </button>
+                </div>
+                {desktopImageMode === "url" ? (
+                  <div className="relative">
+                    <LinkIcon
+                      size={16}
+                      className="absolute left-3 top-3.5 text-slate-700"
+                    />
+                    <input
+                      type="url"
+                      name="desktopImg"
+                      value={currentSlide.desktopImg}
+                      onChange={handleInputChange}
+                      required={!desktopImageFile}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+                    <UploadCloud className="text-slate-700 mb-1" size={24} />
+                    <span className="text-xs text-slate-500">Click to select</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleDesktopFileChange}
+                    />
+                  </label>
+                )}
                 <span className="text-sm font-semibold text-gray-400">Dimension: 1500x650</span>
                 {currentSlide.desktopImg && (
-                  <img
-                    src={currentSlide.desktopImg}
-                    alt="Preview"
-                    className="mt-2 h-32 w-full object-cover rounded"
-                  />
+                  <div className="relative mt-2">
+                    <img
+                      src={currentSlide.desktopImg}
+                      alt="Preview"
+                      className="h-32 w-full object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentSlide((prev) => ({ ...prev, desktopImg: "" }));
+                        setDesktopImageFile(null);
+                      }}
+                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Image URL
-                </label>
-                <input
-                  type="url"
-                  name="mobileImg"
-                  value={currentSlide.mobileImg}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="https://example.com/mobile-image.jpg"
-                />
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Mobile Image
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setMobileImageMode(mobileImageMode === "url" ? "upload" : "url")}
+                    className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+                  >
+                    {mobileImageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                  </button>
+                </div>
+                {mobileImageMode === "url" ? (
+                  <div className="relative">
+                    <LinkIcon
+                      size={16}
+                      className="absolute left-3 top-3.5 text-slate-700"
+                    />
+                    <input
+                      type="url"
+                      name="mobileImg"
+                      value={currentSlide.mobileImg}
+                      onChange={handleInputChange}
+                      required={!mobileImageFile}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      placeholder="https://example.com/mobile-image.jpg"
+                    />
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+                    <UploadCloud className="text-slate-700 mb-1" size={24} />
+                    <span className="text-xs text-slate-500">Click to select</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleMobileFileChange}
+                    />
+                  </label>
+                )}
                 <span className="text-sm font-semibold text-gray-400">Dimension: 600x300</span>
                 {currentSlide.mobileImg && (
-                  <img
-                    src={currentSlide.mobileImg}
-                    alt="Preview"
-                    className="mt-2 h-32 w-full object-cover rounded"
-                  />
+                  <div className="relative mt-2">
+                    <img
+                      src={currentSlide.mobileImg}
+                      alt="Preview"
+                      className="h-32 w-full object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentSlide((prev) => ({ ...prev, mobileImg: "" }));
+                        setMobileImageFile(null);
+                      }}
+                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 )}
               </div>
 
