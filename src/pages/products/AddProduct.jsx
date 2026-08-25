@@ -165,6 +165,8 @@ const AddProduct = () => {
 
       // Handle main image
       if (sourceType.main === "file" && imageFile) {
+        // For serverless environments, file uploads may not work
+        console.warn("File upload mode selected for main image - may not work in serverless environments");
         formDataToSend.append("image", imageFile);
       } else if (sourceType.main === "url") {
         formDataToSend.append("image", formData.image);
@@ -172,6 +174,8 @@ const AddProduct = () => {
 
       // Handle gallery images
       if (sourceType.gallery === "file" && galleryFiles.length > 0) {
+        // For serverless environments, file uploads may not work
+        console.warn("File upload mode selected for gallery - may not work in serverless environments");
         galleryFiles.forEach((file) => {
           formDataToSend.append("images", file);
         });
@@ -211,7 +215,14 @@ const AddProduct = () => {
       setGalleryFiles([]);
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data.message || "Error publishing product");
+      const errorMessage = err.response?.data.message || "Error publishing product";
+      
+      // Provide more helpful error message for serverless file upload issues
+      if (errorMessage.includes("ENOENT") || errorMessage.includes("no such file")) {
+        toast.error("File uploads are not supported in the current environment. Please use image URLs instead.");
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -248,19 +259,24 @@ const AddProduct = () => {
           />
         </div>
       ) : (
-        <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
-          <UploadCloud className="text-slate-700 mb-1" size={24} />
-          <span className="text-xs text-slate-500">
-            Click to select from folder
-          </span>
-          {/* 🟢 FIXED: Added onChange handler here */}
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, name)}
-          />
-        </label>
+        <div>
+          <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+            <UploadCloud className="text-slate-700 mb-1" size={24} />
+            <span className="text-xs text-slate-500">
+              Click to select from folder
+            </span>
+            {/* 🟢 FIXED: Added onChange handler here */}
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, name)}
+            />
+          </label>
+          <p className="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded mt-2">
+            ⚠️ File uploads may not work in serverless environments. URL mode is recommended.
+          </p>
+        </div>
       )}
 
       {value && (
@@ -429,20 +445,25 @@ const AddProduct = () => {
                   </button>
                 </div>
               ) : (
-                <label className="w-full h-20 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer">
-                  <UploadCloud size={20} className="text-slate-700 mr-2" />
-                  <span className="text-sm text-slate-500">
-                    Upload Multiple Images
-                  </span>
-                  {/* 🟢 FIXED: Added handleGalleryFiles here */}
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleGalleryFiles}
-                  />
-                </label>
+                <div>
+                  <label className="w-full h-20 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer">
+                    <UploadCloud size={20} className="text-slate-700 mr-2" />
+                    <span className="text-sm text-slate-500">
+                      Upload Multiple Images
+                    </span>
+                    {/* 🟢 FIXED: Added handleGalleryFiles here */}
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleGalleryFiles}
+                    />
+                  </label>
+                  <p className="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded mt-2">
+                    ⚠️ File uploads may not work in serverless environments. URL mode is recommended.
+                  </p>
+                </div>
               )}
 
               <div className="flex flex-wrap gap-3">

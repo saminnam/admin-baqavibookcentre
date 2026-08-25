@@ -98,8 +98,11 @@ const ManageBlogs = () => {
       formDataToSend.append("content", form.content);
       formDataToSend.append("date", form.date);
 
-      // Handle image
+      // Handle image - prefer URL mode for serverless compatibility
       if (imageMode === "file" && imageFile) {
+        // For serverless environments, file uploads may not work
+        // Show a warning to user
+        console.warn("File upload mode selected - may not work in serverless environments");
         formDataToSend.append("image", imageFile);
       } else if (imageMode === "url") {
         formDataToSend.append("image", form.image);
@@ -124,7 +127,13 @@ const ManageBlogs = () => {
     } catch (err) {
       console.error("Submit error:", err.message);
       const errorMessage = err.response?.data?.message || err.message || "Error saving blog post";
-      alert(`Error: ${errorMessage}`);
+      
+      // Provide more helpful error message for serverless file upload issues
+      if (errorMessage.includes("ENOENT") || errorMessage.includes("no such file")) {
+        alert("Error: File uploads are not supported in the current environment. Please use image URLs instead.");
+      } else {
+        alert(`Error: ${errorMessage}`);
+      }
     }
   };
 
@@ -312,6 +321,11 @@ const ManageBlogs = () => {
                           {imageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
                         </button>
                       </div>
+                      {imageMode === "file" && (
+                        <p className="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                          ⚠️ File uploads may not work in serverless environments. URL mode is recommended.
+                        </p>
+                      )}
                       {imageMode === "url" ? (
                         <div className="relative">
                           <LinkIcon
