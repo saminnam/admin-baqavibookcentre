@@ -146,6 +146,18 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation: Check if image is provided when using file mode in serverless environment
+    if (sourceType.main === "file" && !imageFile && !formData.image) {
+      toast.error("Please provide an image (URL or file upload)");
+      return;
+    }
+    
+    // Warning for file upload mode
+    if (sourceType.main === "file" && imageFile) {
+      toast.warning("File upload mode selected - may not work in serverless environments. URL mode is recommended.");
+    }
+    
     try {
       const formDataToSend = new FormData();
 
@@ -220,6 +232,11 @@ const AddProduct = () => {
       // Provide more helpful error message for serverless file upload issues
       if (errorMessage.includes("ENOENT") || errorMessage.includes("no such file")) {
         toast.error("File uploads are not supported in the current environment. Please use image URLs instead.");
+      } else if (err.response?.data?.details) {
+        // Show detailed validation errors
+        const details = err.response.data.details;
+        const detailMessages = details.map(d => `${d.field}: ${d.message}`).join(", ");
+        toast.error(`Validation error: ${detailMessages}`);
       } else {
         toast.error(errorMessage);
       }
