@@ -15,6 +15,9 @@ const ManageCategories = () => {
     name: "",
   });
 
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingCategory, setDeletingCategory] = useState(null);
+
 
   const [imageMode, setImageMode] = useState("upload"); // "upload" | "url"
   const [editImageFile, setEditImageFile] = useState(null);
@@ -59,10 +62,23 @@ const ManageCategories = () => {
     fetchCategories();
   }, []);
 
-  const handleDelete = async (id) => {
+  const openDelete = (category) => {
+    setDeletingCategory(category);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingCategory(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingCategory?._id) return;
+
     try {
-      await axios.delete(`${API_BASE_URL}/categories/${id}`);
+      await axios.delete(`${API_BASE_URL}/categories/${deletingCategory._id}`);
       toast.success("Category removed");
+      closeDelete();
       fetchCategories();
     } catch {
       toast.error("Unable to delete category");
@@ -165,7 +181,7 @@ const ManageCategories = () => {
                     <Pencil size={16} /> Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(category._id)}
+                    onClick={() => openDelete(category)}
                     className="flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 transition hover:bg-red-50"
                     title="Delete Category"
                   >
@@ -264,6 +280,42 @@ const ManageCategories = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingCategory && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete Category</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete <span className="font-semibold text-slate-900">{deletingCategory.name}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={handleDelete} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete Category
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
