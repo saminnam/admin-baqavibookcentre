@@ -9,6 +9,8 @@ import {
   X,
   Image as ImageIcon,
   FileText,
+  UploadCloud,
+  Link as LinkIcon,
 } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
@@ -16,6 +18,9 @@ const ManageBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  const [imageMode, setImageMode] = useState("url"); // "url" | "file"
+  const [imageFile, setImageFile] = useState(null);
 
   const initialFormState = {
     title: "",
@@ -45,11 +50,15 @@ const ManageBlogs = () => {
   const handleOpenModal = (blog = null) => {
     if (blog) {
       setEditingId(blog._id);
-      setForm({ ...blog }); // Spreading ensures we have all fields including content
+      setForm({ ...blog });
+      const isUrl = typeof blog.image === "string" && blog.image.startsWith("http");
+      setImageMode(isUrl ? "url" : "file");
     } else {
       setEditingId(null);
       setForm(initialFormState);
+      setImageMode("url");
     }
+    setImageFile(null);
     setIsModalOpen(true);
   };
 
@@ -65,15 +74,52 @@ const ManageBlogs = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm((prev) => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("title", form.title);
+      formDataToSend.append("excerpt", form.excerpt);
+      formDataToSend.append("category", form.category);
+      formDataToSend.append("readTime", form.readTime);
+      formDataToSend.append("content", form.content);
+      formDataToSend.append("date", form.date);
+
+      // Handle image
+      if (imageMode === "file" && imageFile) {
+        formDataToSend.append("image", imageFile);
+      } else if (imageMode === "url") {
+        formDataToSend.append("image", form.image);
+      }
+
       if (editingId) {
-        await axios.put(`${API_BASE_URL}/blogs/${editingId}`, form);
+        await axios.put(`${API_BASE_URL}/blogs/${editingId}`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       } else {
-        await axios.post(`${API_BASE_URL}/blogs`, form);
+        await axios.post(`${API_BASE_URL}/blogs`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       }
       setIsModalOpen(false);
+      setImageFile(null);
       fetchBlogs();
     } catch (err) {
       console.error("Submit error:", err.message);
@@ -251,16 +297,67 @@ const ManageBlogs = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider ml-1">
-                        Cover Image URL
-                      </label>
-                      <input
-                        className="w-full bg-slate-50 border border-transparent rounded-xl p-3 focus:bg-white focus:border-indigo-500/30 outline-none transition-all"
-                        value={form.image}
-                        onChange={(e) =>
-                          setForm({ ...form, image: e.target.value })
-                        }
-                      />
+                      <div className="flex justify-between items-center">
+                        <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider ml-1">
+                          Cover Image
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageMode((prev) => (prev === "url" ? "file" : "url"));
+                            if (imageMode === "file") setImageFile(null);
+                          }}
+                          className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
+                        >
+                          {imageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                        </button>
+                      </div>
+                      {imageMode === "url" ? (
+                        <div className="relative">
+                          <LinkIcon
+                            size={16}
+                            className="absolute left-3 top-3.5 text-slate-700"
+                          />
+                          <input
+                            className="w-full bg-slate-50 border border-transparent rounded-xl p-3 pl-10 focus:bg-white focus:border-indigo-500/30 outline-none transition-all"
+                            value={form.image}
+                            onChange={(e) =>
+                              setForm({ ...form, image: e.target.value })
+                            }
+                            placeholder="Paste image URL here..."
+                          />
+                        </div>
+                      ) : (
+                        <label className="w-full border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+                          <UploadCloud className="text-slate-700 mb-1" size={24} />
+                          <span className="text-xs text-slate-500">Click to select</span>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                          />
+                        </label>
+                      )}
+                      {form.image && (
+                        <div className="relative h-32 w-full rounded-xl overflow-hidden border bg-white group">
+                          <img
+                            src={form.image}
+                            alt="Preview"
+                            className="w-full h-full object-contain p-2"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setForm((prev) => ({ ...prev, image: "" }));
+                              setImageFile(null);
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">

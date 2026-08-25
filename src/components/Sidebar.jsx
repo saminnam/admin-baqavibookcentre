@@ -151,10 +151,6 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
       const user = localStorage.getItem("adminUser");
       if (user) {
         const userData = JSON.parse(user);
-        console.log(
-          "Loading permissions from localStorage:",
-          userData.permissions,
-        );
         setUserPermissions(userData.permissions || []);
       }
     };
@@ -204,9 +200,6 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
         !item.permission ||
         hasPermission(item.permission),
     );
-
-  console.log("User permissions:", userPermissions);
-  console.log("Filtered nav items:", filteredNavItems);
 
   return (
     <div className="flex">

@@ -33,6 +33,8 @@ const ManageProducts = () => {
   });
 
   const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [editGalleryFiles, setEditGalleryFiles] = useState([]);
 
   const fetchProducts = async () => {
     try {
@@ -65,10 +67,11 @@ const ManageProducts = () => {
   }, []);
 
 
-  // 🟢 Handle File to Base64 (Same as Add Product)
+  // 🟢 Handle File to Base64 for preview and store file object for upload
   const handleFileChange = (e, name) => {
     const file = e.target.files[0];
     if (file) {
+      setEditImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedProduct((prev) => ({ ...prev, [name]: reader.result }));
@@ -79,6 +82,7 @@ const ManageProducts = () => {
 
   const handleGalleryFiles = (e) => {
     const files = Array.from(e.target.files);
+    setEditGalleryFiles(files);
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -126,12 +130,53 @@ const ManageProducts = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formDataToSend = new FormData();
+
+      // Add all text fields
+      formDataToSend.append("name", selectedProduct.name);
+      formDataToSend.append("slug", selectedProduct.slug);
+      formDataToSend.append("mrp", selectedProduct.mrp);
+      formDataToSend.append("price", selectedProduct.price);
+      formDataToSend.append("discount", selectedProduct.discount);
+      formDataToSend.append("stock", selectedProduct.stock);
+      formDataToSend.append("status", selectedProduct.status);
+      formDataToSend.append("category", selectedProduct.category);
+      formDataToSend.append("desc", selectedProduct.desc);
+      formDataToSend.append("productDetails", selectedProduct.productDetails);
+      formDataToSend.append("author", selectedProduct.author);
+      formDataToSend.append("rating", selectedProduct.rating);
+
+      // Handle main image
+      if (editSourceType.main === "file" && editImageFile) {
+        formDataToSend.append("image", editImageFile);
+      } else if (editSourceType.main === "url") {
+        formDataToSend.append("image", selectedProduct.image);
+      }
+
+      // Handle gallery images
+      if (editSourceType.gallery === "file" && editGalleryFiles.length > 0) {
+        editGalleryFiles.forEach((file) => {
+          formDataToSend.append("images", file);
+        });
+      } else if (editSourceType.gallery === "url" && selectedProduct.images) {
+        selectedProduct.images.forEach((img) => {
+          formDataToSend.append("images", img);
+        });
+      }
+
       await axios.put(
         `${API_BASE_URL}/products/${selectedProduct._id}`,
-        selectedProduct,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       toast.success("Product Updated Successfully!");
       setIsEditOpen(false);
+      setEditImageFile(null);
+      setEditGalleryFiles([]);
       fetchProducts();
     } catch {
       toast.error("Update failed");

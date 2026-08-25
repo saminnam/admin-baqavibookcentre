@@ -46,22 +46,27 @@ const AddProduct = () => {
     gallery: "url",
   });
 
-  // 🟢 FIXED: Handler to convert files to Base64 strings for DB storage
+  const [imageFile, setImageFile] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+
+  // 🟢 FIXED: Handler to store file object for FormData upload
   const handleFileChange = (e, name) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, [name]: reader.result })); // This is the Base64 string
+        setFormData((prev) => ({ ...prev, [name]: reader.result })); // For preview only
         toast.success(`${name} loaded and ready to save`);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // 🟢 FIXED: Multi-file gallery handler for Base64
+  // 🟢 FIXED: Multi-file gallery handler for FormData upload
   const handleGalleryFiles = (e) => {
     const files = Array.from(e.target.files);
+    setGalleryFiles(files);
 
     files.forEach((file) => {
       const reader = new FileReader();
@@ -142,12 +147,48 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE_URL}/products`, formData);
+      const formDataToSend = new FormData();
 
-      // 🟢 1. Trigger the toast
+      // Add all text fields
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("slug", formData.slug);
+      formDataToSend.append("mrp", formData.mrp);
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("discount", formData.discount);
+      formDataToSend.append("stock", formData.stock);
+      formDataToSend.append("status", formData.status);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("desc", formData.desc);
+      formDataToSend.append("productDetails", formData.productDetails);
+      formDataToSend.append("author", formData.author);
+      formDataToSend.append("rating", formData.rating);
+
+      // Handle main image
+      if (sourceType.main === "file" && imageFile) {
+        formDataToSend.append("image", imageFile);
+      } else if (sourceType.main === "url") {
+        formDataToSend.append("image", formData.image);
+      }
+
+      // Handle gallery images
+      if (sourceType.gallery === "file" && galleryFiles.length > 0) {
+        galleryFiles.forEach((file) => {
+          formDataToSend.append("images", file);
+        });
+      } else if (sourceType.gallery === "url" && formData.images.length > 0) {
+        formData.images.forEach((img) => {
+          formDataToSend.append("images", img);
+        });
+      }
+
+      await axios.post(`${API_BASE_URL}/products`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       toast.success("Product Published Successfully!");
 
-      // 🟢 2. Clear the form state
       setFormData({
         name: "",
         slug: "",
@@ -165,8 +206,9 @@ const AddProduct = () => {
         rating: "",
       });
 
-      // 🟢 3. Optional: Clear local gallery input state
       setGalleryInput("");
+      setImageFile(null);
+      setGalleryFiles([]);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data.message || "Error publishing product");
