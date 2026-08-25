@@ -161,6 +161,8 @@ const Sidebar = ({ sidebarExpanded, hoveringSidebar, setHoveringSidebar }) => {
       loadPermissions();
     };
 
+    
+
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener("custom-storage-update", handleStorageChange);
 
