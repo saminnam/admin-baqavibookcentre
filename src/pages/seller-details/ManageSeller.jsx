@@ -25,6 +25,8 @@ const ManageSellers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingSeller, setDeletingSeller] = useState(null);
 
   // 1. Fetch Data
   const fetchSellers = async () => {
@@ -39,14 +41,25 @@ const ManageSellers = () => {
   };
 
   // 2. Delete Seller
-  const deleteSeller = async (id) => {
-    if (window.confirm("Remove this seller from the database?")) {
-      try {
-        await axios.delete(`${API_BASE_URL}/seller/${id}`);
-        setSellers(sellers.filter((s) => s._id !== id));
-      } catch (error) {
-        alert("Delete failed");
-      }
+  const openDelete = (seller) => {
+    setDeletingSeller(seller);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingSeller(null);
+  };
+
+  const deleteSeller = async () => {
+    if (!deletingSeller?._id) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/seller/${deletingSeller._id}`);
+      setSellers(sellers.filter((s) => s._id !== deletingSeller._id));
+      closeDelete();
+    } catch (error) {
+      alert("Delete failed");
     }
   };
 
@@ -191,7 +204,7 @@ const ManageSellers = () => {
                       {seller.isVerified ? "✓ Verified" : "Pending"}
                     </button>
                     <button
-                      onClick={() => deleteSeller(seller._id)}
+                      onClick={() => openDelete(seller)}
                       className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl cursor-pointer transition-all"
                       title="Delete Seller"
                     >
@@ -315,10 +328,7 @@ const ManageSellers = () => {
                 )}
               </button>
               <button
-                onClick={() => {
-                  deleteSeller(selectedSeller._id);
-                  setSelectedSeller(null);
-                }}
+                onClick={() => { openDelete(selectedSeller); setSelectedSeller(null); }}
                 className="bg-red-500 text-white px-8 py-3 rounded-2xl text-sm font-bold shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center gap-2"
               >
                 <Trash2 size={18} /> Delete Seller
@@ -329,6 +339,42 @@ const ManageSellers = () => {
               >
                 Close Profile
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingSeller && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete Seller</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete <span className="font-semibold text-slate-900">{deletingSeller.businessName}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={deleteSeller} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete Seller
+                </button>
+              </div>
             </div>
           </div>
         </div>

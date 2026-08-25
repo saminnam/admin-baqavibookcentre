@@ -25,6 +25,8 @@ const ManageProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingProduct, setDeletingProduct] = useState(null);
 
   // Image Source Toggle for Modal
   const [editSourceType, setEditSourceType] = useState({
@@ -101,15 +103,26 @@ const ManageProducts = () => {
       [section]: prev[section] === "url" ? "file" : "url",
     }));
   };
-  const deleteProduct = async (id) => {
-    if (window.confirm("Delete this product permanently?")) {
-      try {
-        await axios.delete(`${API_BASE_URL}/products/${id}`);
-        fetchProducts();
-        toast.success("Product Deleted");
-      } catch {
-        toast.error("Delete failed");
-      }
+  const openDelete = (product) => {
+    setDeletingProduct(product);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingProduct(null);
+  };
+
+  const deleteProduct = async () => {
+    if (!deletingProduct?._id) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/products/${deletingProduct._id}`);
+      closeDelete();
+      fetchProducts();
+      toast.success("Product Deleted");
+    } catch {
+      toast.error("Delete failed");
     }
   };
   const handleEditChange = (e) => {
@@ -329,7 +342,7 @@ const ManageProducts = () => {
                         <Edit3 size={18} />
                       </button>
                       <button
-                        onClick={() => deleteProduct(p._id)}
+                        onClick={() => openDelete(p)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                       >
                         <Trash2 size={18} />
@@ -692,6 +705,42 @@ const ManageProducts = () => {
                 <p className="text-sm text-gray-500 italic">
                   {selectedProduct.desc || "No description provided."}
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingProduct && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete Product</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete <span className="font-semibold text-slate-900">{deletingProduct.name}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={deleteProduct} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete Product
+                </button>
               </div>
             </div>
           </div>

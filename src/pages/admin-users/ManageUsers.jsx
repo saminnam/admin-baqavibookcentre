@@ -11,6 +11,8 @@ const ManageUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(null);
 
   const fetchRoles = async () => {
     try {
@@ -38,15 +40,28 @@ const ManageUsers = () => {
     fetchRoles();
   }, []);
 
-  const handleDelete = async (id, email) => {
-    if (email === "admin@example.com")
-      return alert("Cannot delete default admin!");
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+  const openDelete = (user) => {
+    if (user.email === "admin@example.com") {
+      alert("Cannot delete default admin!");
+      return;
+    }
+    setDeletingUser(user);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingUser(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingUser?._id) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/admin-users/${id}`);
-      setUsers(users.filter((u) => u._id !== id));
+      await axios.delete(`${API_BASE_URL}/admin-users/${deletingUser._id}`);
+      setUsers(users.filter((u) => u._id !== deletingUser._id));
       if (selectedUser) setSelectedUser(null);
+      closeDelete();
     } catch {
       alert("Failed to delete user");
     }
@@ -201,7 +216,7 @@ const ManageUsers = () => {
                           <Edit2 size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(user._id, user.email)}
+                          onClick={() => openDelete(user)}
                           className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                           title="Delete User"
                         >
@@ -352,6 +367,42 @@ const ManageUsers = () => {
               <button onClick={handleEdit} className="bg-[#E5B236] text-white px-8 py-3 rounded-2xl text-sm font-bold hover:scale-105 transition-all">
                 Save Changes
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingUser && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete User</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete <span className="font-semibold text-slate-900">{deletingUser.name}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={handleDelete} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete User
+                </button>
+              </div>
             </div>
           </div>
         </div>

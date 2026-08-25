@@ -8,6 +8,8 @@ const ManageOfferHeroSlides = () => {
   const [slides, setSlides] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingSlide, setDeletingSlide] = useState(null);
   const [imageMode, setImageMode] = useState("upload");
   const [imageFile, setImageFile] = useState(null);
   const [currentSlide, setCurrentSlide] = useState({
@@ -93,15 +95,26 @@ const ManageOfferHeroSlides = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this slide?")) {
-      try {
-        await axios.delete(`${API_BASE_URL}/offerHero-slides/${id}`);
-        toast.success("Offer hero slide deleted successfully");
-        fetchSlides();
-      } catch {
-        toast.error("Failed to delete slide");
-      }
+  const openDelete = (slide) => {
+    setDeletingSlide(slide);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingSlide(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingSlide?._id) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/offerHero-slides/${deletingSlide._id}`);
+      toast.success("Offer hero slide deleted successfully");
+      closeDelete();
+      fetchSlides();
+    } catch {
+      toast.error("Failed to delete slide");
     }
   };
 
@@ -199,7 +212,7 @@ const ManageOfferHeroSlides = () => {
                       <Edit3 size={18} />
                     </button>
                     <button
-                      onClick={() => handleDelete(slide._id)}
+                      onClick={() => openDelete(slide)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 size={18} />
@@ -372,6 +385,42 @@ const ManageOfferHeroSlides = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingSlide && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete Offer Hero Slide</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete <span className="font-semibold text-slate-900">{deletingSlide.title}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={handleDelete} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete Slide
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

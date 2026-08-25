@@ -14,6 +14,8 @@ const ManageOrders = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingOrder, setDeletingOrder] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -39,14 +41,24 @@ const ManageOrders = () => {
   };
 
 
-  const deleteOrder = async (orderId) => {
-    try {
-      const ok = window.confirm("Are you sure you want to delete this order? This action cannot be undone.");
-      if (!ok) return;
+  const openDelete = (order) => {
+    setDeletingOrder(order);
+    setIsDeleteOpen(true);
+  };
 
-      await axios.delete(`${API_BASE_URL}/orders/${orderId}`);
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeletingOrder(null);
+  };
+
+  const deleteOrder = async () => {
+    if (!deletingOrder?._id) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/orders/${deletingOrder._id}`);
       await fetchOrders();
-      if (selectedOrder && selectedOrder._id === orderId) setSelectedOrder(null);
+      if (selectedOrder && selectedOrder._id === deletingOrder._id) setSelectedOrder(null);
+      closeDelete();
       alert("Order deleted successfully!");
     } catch (error) {
       console.error(error);
@@ -149,7 +161,7 @@ const ManageOrders = () => {
                       <Eye size={18} />
                     </button>
                     <button
-                      onClick={() => deleteOrder(order._id)}
+                      onClick={() => openDelete(order)}
                       className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all"
                       aria-label="Delete order"
                       title="Delete order"
@@ -239,6 +251,42 @@ const ManageOrders = () => {
               <div className="w-full flex justify-center gap-3 mt-2 border-t border-slate-200 pt-4">
                 <ActionButton label="Back to Pending" color="amber" icon={<Clock size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Pending")} />
                 <ActionButton label="Cancel Order" color="red" icon={<Ban size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Cancelled")} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteOpen && deletingOrder && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-100 text-red-800 rounded-xl p-2">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Delete Order</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Confirm deletion</p>
+                </div>
+              </div>
+              <button onClick={closeDelete} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Are you sure you want to delete order <span className="font-semibold text-slate-900">#{deletingOrder._id.slice(-6).toUpperCase()}</span>? This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closeDelete} className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button onClick={deleteOrder} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
+                  Delete Order
+                </button>
               </div>
             </div>
           </div>
