@@ -41,9 +41,9 @@ const AddProduct = () => {
   const [galleryInput, setGalleryInput] = useState("");
 
   const [sourceType, setSourceType] = useState({
-    main: "url", // Default to URL mode for serverless compatibility
+    main: "url",
     category: "url",
-    gallery: "url", // Default to URL mode for serverless compatibility
+    gallery: "url",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -82,11 +82,9 @@ const AddProduct = () => {
   };
 
   const toggleSource = (section) => {
-    // For serverless environments, only allow URL mode
-    console.warn("File upload mode is disabled for serverless environments. Using URL mode.");
     setSourceType((prev) => ({
       ...prev,
-      [section]: "url", // Always force URL mode
+      [section]: prev[section] === "url" ? "file" : "url",
     }));
   };
 
@@ -252,26 +250,45 @@ const AddProduct = () => {
         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
           {label}
         </label>
-        {/* Hide toggle button for serverless environments - URL mode only */}
-        <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-          URL MODE
-        </span>
+        <button
+          type="button"
+          onClick={() => toggleSource(sectionKey)}
+          className="text-[10px] font-bold text-[#1E2939] bg-indigo-50 px-2 py-1 rounded-md hover:bg-indigo-100"
+        >
+          {sourceType[sectionKey] === "url"
+            ? "SWITCH TO UPLOAD"
+            : "SWITCH TO URL"}
+        </button>
       </div>
 
-      {/* Always show URL input for serverless compatibility */}
-      <div className="relative">
-        <LinkIcon
-          size={16}
-          className="absolute left-3 top-3.5 text-slate-700"
-        />
-        <input
-          name={name}
-          value={value || ""}
-          onChange={handleChange}
-          placeholder="Paste image URL here..."
-          className="w-full border border-slate-200 rounded-xl p-3 pl-10 focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-slate-900"
-        />
-      </div>
+      {sourceType[sectionKey] === "url" ? (
+        <div className="relative">
+          <LinkIcon
+            size={16}
+            className="absolute left-3 top-3.5 text-slate-700"
+          />
+          <input
+            name={name}
+            value={value || ""}
+            onChange={handleChange}
+            placeholder="Paste image URL here..."
+            className="w-full border border-slate-200 rounded-xl p-3 pl-10 focus:ring-2 focus:ring-indigo-500 outline-none bg-white text-slate-900"
+          />
+        </div>
+      ) : (
+        <label className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+          <UploadCloud className="text-slate-700 mb-1" size={24} />
+          <span className="text-xs text-slate-500">
+            Click to select from folder
+          </span>
+          <input
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, name)}
+          />
+        </label>
+      )}
 
       {value && (
         <div className="relative h-32 w-full rounded-xl overflow-hidden border bg-white group">
@@ -411,28 +428,48 @@ const AddProduct = () => {
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Additional Gallery
                 </label>
-                {/* Hide toggle button for serverless environments - URL mode only */}
-                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-                  URL MODE
-                </span>
-              </div>
-
-              {/* Always show URL input for serverless compatibility */}
-              <div className="flex gap-2">
-                <input
-                  value={galleryInput}
-                  onChange={(e) => setGalleryInput(e.target.value)}
-                  className="flex-1 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
-                  placeholder="Paste gallery image link..."
-                />
                 <button
                   type="button"
-                  onClick={addGalleryImage}
-                  className="bg-slate-900 text-white px-6 rounded-xl font-bold"
+                  onClick={() => toggleSource("gallery")}
+                  className="text-[10px] font-bold text-[#E5B234] bg-indigo-50 px-2 py-1 rounded-md"
                 >
-                  Add
+                  {sourceType.gallery === "url"
+                    ? "SWITCH TO UPLOAD"
+                    : "SWITCH TO URL"}
                 </button>
               </div>
+
+              {sourceType.gallery === "url" ? (
+                <div className="flex gap-2">
+                  <input
+                    value={galleryInput}
+                    onChange={(e) => setGalleryInput(e.target.value)}
+                    className="flex-1 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
+                    placeholder="Paste gallery image link..."
+                  />
+                  <button
+                    type="button"
+                    onClick={addGalleryImage}
+                    className="bg-slate-900 text-white px-6 rounded-xl font-bold"
+                  >
+                    Add
+                  </button>
+                </div>
+              ) : (
+                <label className="w-full h-20 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer">
+                  <UploadCloud size={20} className="text-slate-700 mr-2" />
+                  <span className="text-sm text-slate-500">
+                    Upload Multiple Images
+                  </span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleGalleryFiles}
+                  />
+                </label>
+              )}
 
               <div className="flex flex-wrap gap-3">
                 {formData.images.map((img, index) => (

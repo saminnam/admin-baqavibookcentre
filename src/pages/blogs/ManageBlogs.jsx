@@ -19,7 +19,7 @@ const ManageBlogs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const [imageMode, setImageMode] = useState("url"); // Always URL mode for serverless compatibility
+  const [imageMode, setImageMode] = useState("url"); // "url" | "file"
   const [imageFile, setImageFile] = useState(null);
 
   const initialFormState = {
@@ -51,8 +51,8 @@ const ManageBlogs = () => {
     if (blog) {
       setEditingId(blog._id);
       setForm({ ...blog });
-      // Always use URL mode for serverless compatibility
-      setImageMode("url");
+      const isUrl = typeof blog.image === "string" && blog.image.startsWith("http");
+      setImageMode(isUrl ? "url" : "file");
     } else {
       setEditingId(null);
       setForm(initialFormState);
@@ -98,8 +98,12 @@ const ManageBlogs = () => {
       formDataToSend.append("content", form.content);
       formDataToSend.append("date", form.date);
 
-      // Always use URL mode for serverless compatibility
-      formDataToSend.append("image", form.image);
+      // Handle image
+      if (imageMode === "file" && imageFile) {
+        formDataToSend.append("image", imageFile);
+      } else if (imageMode === "url") {
+        formDataToSend.append("image", form.image);
+      }
 
       if (editingId) {
         await axios.put(`${API_BASE_URL}/blogs/${editingId}`, formDataToSend, {
@@ -297,27 +301,44 @@ const ManageBlogs = () => {
                         <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider ml-1">
                           Cover Image
                         </label>
-                        {/* Hide toggle button for serverless environments - URL mode only */}
-                        <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
-                          URL MODE
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageMode((prev) => (prev === "url" ? "file" : "url"));
+                            if (imageMode === "file") setImageFile(null);
+                          }}
+                          className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
+                        >
+                          {imageMode === "url" ? "SWITCH TO UPLOAD" : "SWITCH TO URL"}
+                        </button>
                       </div>
-                      
-                      {/* Always show URL input for serverless compatibility */}
-                      <div className="relative">
-                        <LinkIcon
-                          size={16}
-                          className="absolute left-3 top-3.5 text-slate-700"
-                        />
-                        <input
-                          className="w-full bg-slate-50 border border-transparent rounded-xl p-3 pl-10 focus:bg-white focus:border-indigo-500/30 outline-none transition-all"
-                          value={form.image}
-                          onChange={(e) =>
-                            setForm({ ...form, image: e.target.value })
-                          }
-                          placeholder="Paste image URL here..."
-                        />
-                      </div>
+                      {imageMode === "url" ? (
+                        <div className="relative">
+                          <LinkIcon
+                            size={16}
+                            className="absolute left-3 top-3.5 text-slate-700"
+                          />
+                          <input
+                            className="w-full bg-slate-50 border border-transparent rounded-xl p-3 pl-10 focus:bg-white focus:border-indigo-500/30 outline-none transition-all"
+                            value={form.image}
+                            onChange={(e) =>
+                              setForm({ ...form, image: e.target.value })
+                            }
+                            placeholder="Paste image URL here..."
+                          />
+                        </div>
+                      ) : (
+                        <label className="w-full border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:border-indigo-300 cursor-pointer transition-all">
+                          <UploadCloud className="text-slate-700 mb-1" size={24} />
+                          <span className="text-xs text-slate-500">Click to select</span>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                          />
+                        </label>
+                      )}
                       {form.image && (
                         <div className="relative h-32 w-full rounded-xl overflow-hidden border bg-white group">
                           <img
