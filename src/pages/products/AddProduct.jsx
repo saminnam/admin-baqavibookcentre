@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import {
   ImagePlus,
   Trash2,
@@ -17,6 +18,10 @@ import {
 import { API_BASE_URL } from "../../components/Api";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editProductId, setEditProductId] = useState(null);
+  
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -30,9 +35,11 @@ const AddProduct = () => {
     // store category name (for website filtering)
     category: "",
     desc: "",
+    descriptions: [""],
     productDetails: "",
     author: "",
     rating: "",
+    productCode: "",
   });
 
   const [categories, setCategories] = useState([]);
@@ -102,6 +109,39 @@ const AddProduct = () => {
     };
 
     fetchCategories();
+
+    // Check for edit mode data
+    const editProductData = localStorage.getItem('editProductData');
+    if (editProductData) {
+      try {
+        const product = JSON.parse(editProductData);
+        setFormData({
+          name: product.name || "",
+          slug: product.slug || "",
+          image: product.image || "",
+          images: product.images || [],
+          mrp: product.mrp || "",
+          price: product.price || "",
+          discount: product.discount || "",
+          stock: product.stock || "",
+          status: product.status || "active",
+          category: product.category || "",
+          desc: product.desc || "",
+          descriptions: product.descriptions || [""],
+          productDetails: product.productDetails || "",
+          author: product.author || "",
+          rating: product.rating || "",
+          productCode: product.productCode || "",
+        });
+        setEditProductId(product._id);
+        setIsEditMode(true);
+        // Clear the localStorage after loading
+        localStorage.removeItem('editProductData');
+      } catch (error) {
+        console.error('Error parsing edit product data:', error);
+        toast.error('Error loading product data for editing');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -144,6 +184,27 @@ const AddProduct = () => {
     }));
   };
 
+  const addDescription = () => {
+    setFormData((prev) => ({
+      ...prev,
+      descriptions: [...prev.descriptions, ""],
+    }));
+  };
+
+  const removeDescription = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      descriptions: prev.descriptions.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleDescriptionChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      descriptions: prev.descriptions.map((desc, i) => i === index ? value : desc),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -171,9 +232,11 @@ const AddProduct = () => {
       formDataToSend.append("status", formData.status);
       formDataToSend.append("category", formData.category);
       formDataToSend.append("desc", formData.desc);
+      formDataToSend.append("descriptions", JSON.stringify(formData.descriptions.filter(d => d.trim() !== "")));
       formDataToSend.append("productDetails", formData.productDetails);
       formDataToSend.append("author", formData.author);
       formDataToSend.append("rating", formData.rating);
+      formDataToSend.append("productCode", formData.productCode);
 
       // Handle main image
       if (sourceType.main === "file" && imageFile) {
@@ -197,14 +260,25 @@ const AddProduct = () => {
         });
       }
 
-      await axios.post(`${API_BASE_URL}/products`, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (isEditMode && editProductId) {
+        // Update existing product
+        await axios.put(`${API_BASE_URL}/products/${editProductId}`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        toast.success("Product Updated Successfully!");
+      } else {
+        // Create new product
+        await axios.post(`${API_BASE_URL}/products`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        toast.success("Product Published Successfully!");
+      }
 
-      toast.success("Product Published Successfully!");
-
+      // Reset form and navigate back
       setFormData({
         name: "",
         slug: "",
@@ -217,14 +291,21 @@ const AddProduct = () => {
         status: "active",
         category: "",
         desc: "",
+        descriptions: [""],
         productDetails: "",
         author: "",
         rating: "",
+        productCode: "",
       });
 
       setGalleryInput("");
       setImageFile(null);
       setGalleryFiles([]);
+      setIsEditMode(false);
+      setEditProductId(null);
+      
+      // Navigate back to product list
+      navigate('/product-list');
     } catch (err) {
       console.error(err);
       const errorMessage = err.response?.data.message || "Error publishing product";
@@ -314,19 +395,30 @@ const AddProduct = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900">
-            Add Product
+            {isEditMode ? "Edit Product" : "Add Product"}
           </h1>
           <p className="text-slate-500">
-            Create a new listing with gallery and category details.
+            {isEditMode ? "Update existing product details." : "Create a new listing with gallery and category details."}
           </p>
         </div>
-        <button
-          form="product-form"
-          type="submit"
-          className="bg-[#1E2939] hover:bg-[#090f17] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all"
-        >
-          <Save size={20} /> Publish
-        </button>
+        <div className="flex gap-3">
+          {isEditMode && (
+            <button
+              type="button"
+              onClick={() => navigate('/product-list')}
+              className="border border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-50 transition-all"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            form="product-form"
+            type="submit"
+            className="bg-[#1E2939] hover:bg-[#090f17] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all"
+          >
+            <Save size={20} /> {isEditMode ? "Update" : "Publish"}
+          </button>
+        </div>
       </div>
 
       <form
@@ -355,6 +447,20 @@ const AddProduct = () => {
                   required
                 />
               </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">
+                  Product Code
+                </label>
+                <input
+                  name="productCode"
+                  value={formData.productCode}
+                  onChange={handleChange}
+                  className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
+                  placeholder="Unique product code..."
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   SEO Slug
@@ -511,6 +617,43 @@ const AddProduct = () => {
               className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
               placeholder="Short description..."
             ></textarea>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold text-slate-500 uppercase">
+                  Product Descriptions
+                </label>
+                <button
+                  type="button"
+                  onClick={addDescription}
+                  className="text-xs font-bold text-[#1E2939] bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100"
+                >
+                  + Add Description
+                </button>
+              </div>
+              
+              {formData.descriptions.map((desc, index) => (
+                <div key={index} className="flex gap-2">
+                  <textarea
+                    value={desc}
+                    onChange={(e) => handleDescriptionChange(index, e.target.value)}
+                    rows="2"
+                    className="flex-1 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
+                    placeholder={`Description ${index + 1}...`}
+                  ></textarea>
+                  {formData.descriptions.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeDescription(index)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-xl border border-slate-200"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
             <textarea
               name="productDetails"
               value={formData.productDetails}

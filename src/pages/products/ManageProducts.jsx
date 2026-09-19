@@ -1,56 +1,56 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import {
   Trash2,
   Edit3,
   Eye,
   Search,
-  Save,
-  X,
-  UploadCloud,
   AlertTriangle,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const ManageProducts = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const itemsPerPage = 10;
 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-
   // Modal States
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState(null);
 
-  // Image Source Toggle for Modal
-  const [editSourceType, setEditSourceType] = useState({
-    main: "url",
-    gallery: "url",
-  });
-
-  const [newGalleryUrl, setNewGalleryUrl] = useState("");
-  const [editImageFile, setEditImageFile] = useState(null);
-  const [editGalleryFiles, setEditGalleryFiles] = useState([]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1) => {
     try {
-      const { data } = await axios.get(`${API_BASE_URL}/products?limit=1000`);
+      const { data } = await axios.get(`${API_BASE_URL}/products?page=${page}&limit=${itemsPerPage}`);
       const productsData = data.products || data;
       setProducts(Array.isArray(productsData) ? productsData : []);
+      
+      if (data.pagination) {
+        setTotalPages(data.pagination.pages);
+        setTotalProducts(data.pagination.total);
+        setCurrentPage(data.pagination.current);
+      }
     } catch (error) {
       toast.error("Failed to load products");
     }
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -69,40 +69,6 @@ const ManageProducts = () => {
   }, []);
 
 
-  // 🟢 Handle File to Base64 for preview and store file object for upload
-  const handleFileChange = (e, name) => {
-    const file = e.target.files[0];
-    if (file) {
-      setEditImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedProduct((prev) => ({ ...prev, [name]: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleGalleryFiles = (e) => {
-    const files = Array.from(e.target.files);
-    setEditGalleryFiles(files);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedProduct((prev) => ({
-          ...prev,
-          images: [...(prev.images || []), reader.result],
-        }));
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const toggleEditSource = (section) => {
-    setEditSourceType((prev) => ({
-      ...prev,
-      [section]: prev[section] === "url" ? "file" : "url",
-    }));
-  };
   const openDelete = (product) => {
     setDeletingProduct(product);
     setIsDeleteOpen(true);
@@ -119,126 +85,24 @@ const ManageProducts = () => {
     try {
       await axios.delete(`${API_BASE_URL}/products/${deletingProduct._id}`);
       closeDelete();
-      fetchProducts();
+      fetchProducts(currentPage);
       toast.success("Product Deleted");
     } catch {
       toast.error("Delete failed");
     }
   };
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setSelectedProduct((prev) => {
-      const updated = { ...prev, [name]: value };
-      // Auto-calculate price if MRP or Discount changes
-      if (name === "mrp" || name === "discount") {
-        const mrp = name === "mrp" ? parseFloat(value) : parseFloat(prev.mrp);
-        const disc =
-          name === "discount" ? parseFloat(value) : parseFloat(prev.discount);
-        updated.price = Math.round(mrp - (mrp * (disc || 0)) / 100);
-      }
-      return updated;
-    });
-  };
 
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const formDataToSend = new FormData();
-
-      // Add all text fields
-      formDataToSend.append("name", selectedProduct.name);
-      formDataToSend.append("slug", selectedProduct.slug);
-      formDataToSend.append("mrp", selectedProduct.mrp);
-      formDataToSend.append("price", selectedProduct.price);
-      formDataToSend.append("discount", selectedProduct.discount);
-      formDataToSend.append("stock", selectedProduct.stock);
-      formDataToSend.append("status", selectedProduct.status);
-      formDataToSend.append("category", selectedProduct.category);
-      formDataToSend.append("desc", selectedProduct.desc);
-      formDataToSend.append("productDetails", selectedProduct.productDetails);
-      formDataToSend.append("author", selectedProduct.author);
-      formDataToSend.append("rating", selectedProduct.rating);
-
-      // Handle main image
-      if (editSourceType.main === "file" && editImageFile) {
-        formDataToSend.append("image", editImageFile);
-      } else if (editSourceType.main === "url") {
-        formDataToSend.append("image", selectedProduct.image);
-      }
-
-      // Handle gallery images
-      if (editSourceType.gallery === "file" && editGalleryFiles.length > 0) {
-        editGalleryFiles.forEach((file) => {
-          formDataToSend.append("images", file);
-        });
-      } else if (editSourceType.gallery === "url" && selectedProduct.images) {
-        selectedProduct.images.forEach((img) => {
-          formDataToSend.append("images", img);
-        });
-      }
-
-      await axios.put(
-        `${API_BASE_URL}/products/${selectedProduct._id}`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      toast.success("Product Updated Successfully!");
-      setIsEditOpen(false);
-      setEditImageFile(null);
-      setEditGalleryFiles([]);
-      fetchProducts();
-    } catch {
-      toast.error("Update failed");
-    }
+  const handleEdit = (product) => {
+    // Store product data in localStorage for the AddProduct page to use
+    localStorage.setItem('editProductData', JSON.stringify(product));
+    navigate('/add-product');
   };
 
   const filteredProducts = products.filter(
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
-  // Reusable Image Input Component for Modal
-  const EditImageInput = ({ label, name, value, sectionKey }) => (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <label className="text-sm font-bold text-gray-600">{label}</label>
-        <button
-          type="button"
-          onClick={() => toggleEditSource(sectionKey)}
-          className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
-        >
-          {editSourceType[sectionKey] === "url" ? "USE FOLDER" : "USE URL"}
-        </button>
-      </div>
-
-      {editSourceType[sectionKey] === "url" ? (
-        <input
-          name={name}
-          value={value || ""}
-          onChange={handleEditChange}
-          className="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-yellow-500"
-          placeholder="Paste Image URL..."
-        />
-      ) : (
-        <label className="flex items-center justify-center border-2 border-dashed rounded-xl p-3 bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
-          <UploadCloud size={18} className="text-gray-400 mr-2" />
-          <span className="text-xs text-gray-500 font-medium">
-            Click to upload from folder
-          </span>
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, name)}
-          />
-        </label>
-      )}
-    </div>
+      p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.productCode && p.productCode.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   return (
@@ -273,6 +137,7 @@ const ManageProducts = () => {
               <tr>
                 <th className="p-4 text-xs uppercase font-bold">Product</th>
                 <th className="p-4 text-xs uppercase font-bold">Category</th>
+                <th className="p-4 text-xs uppercase font-bold">Product Code</th>
                 <th className="p-4 text-xs uppercase font-bold">Price</th>
                 <th className="p-4 text-xs uppercase font-bold">Stock</th>
                 <th className="p-4 text-xs uppercase font-bold text-center">
@@ -308,8 +173,9 @@ const ManageProducts = () => {
                         )}
                       </div>
                     </td>
-                  <td className="p-4 text-sm text-gray-600">{p.category}</td>
-                  <td className="p-4 font-bold text-gray-800">₹{p.price}</td>
+                    <td className="p-4 text-sm text-gray-600">{p.category}</td>
+                    <td className="p-4 text-sm text-gray-600">{p.productCode || "-"}</td>
+                    <td className="p-4 font-bold text-gray-800">₹{p.price}</td>
                   <td className="p-4">
                     {p.stock <= 0 ? (
                       <span className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold flex items-center gap-1 w-fit">
@@ -333,10 +199,7 @@ const ManageProducts = () => {
                         <Eye size={18} />
                       </button>
                       <button
-                        onClick={() => {
-                          setSelectedProduct({ ...p });
-                          setIsEditOpen(true);
-                        }}
+                        onClick={() => handleEdit(p)}
                         className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg"
                       >
                         <Edit3 size={18} />
@@ -357,306 +220,66 @@ const ManageProducts = () => {
         </div>
       </div>
 
-      {/* ================= MODAL: EDIT PRODUCT (Add-Product Style) ================= */}
-      {isEditOpen && selectedProduct && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-6xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-              <div>
-                <h2 className="text-xl font-extrabold text-gray-800">
-                  Update Product
-                </h2>
-                <p className="text-xs text-gray-500 uppercase">
-                  Modify existing inventory data
-                </p>
-              </div>
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition"
-              >
-                <X />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <form
-              onSubmit={handleEditSubmit}
-              className="p-6 md:p-10 overflow-y-auto"
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-4 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+          <div className="text-sm text-gray-600">
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalProducts)} of {totalProducts} products
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Column 1: Core Details */}
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-500 uppercase">
-                        Product Name
-                      </label>
-                      <input
-                        name="name"
-                        value={selectedProduct.name}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-500"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-500 uppercase">
-                        Category
-                      </label>
-                      <select
-                        name="category"
-                        value={selectedProduct.category || ""}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-500"
-                        required
-                      >
-                        <option value="" disabled>
-                          {categoriesLoading ? "Loading categories..." : "Select category"}
-                        </option>
-                        {categories.map((cat) => (
-                          <option key={cat._id} value={cat.name}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <EditImageInput
-                      label="Main Image"
-                      name="image"
-                      value={selectedProduct.image}
-                      sectionKey="main"
-                    />
-
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-500 uppercase">
-                      Full Specifications
-                    </label>
-                    <textarea
-                      name="productDetails"
-                      value={selectedProduct.productDetails}
-                      onChange={handleEditChange}
-                      rows="6"
-                      className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-500"
-                    />
-                  </div>
-                  {/* Edit Gallery (Always at the bottom) */}
-                  <div className="">
-                    <div className="flex justify-between items-center mb-4">
-                      <label className="text-sm font-bold text-gray-700 uppercase">
-                        Gallery Photos
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => toggleEditSource("gallery")}
-                        className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
-                      >
-                        {editSourceType.gallery === "url"
-                          ? "SWITCH TO FOLDER"
-                          : "SWITCH TO URL"}
-                      </button>
-                    </div>
-
-                    {editSourceType.gallery === "url" ? (
-                      <div className="flex gap-2">
-                        <input
-                          value={newGalleryUrl}
-                          onChange={(e) => setNewGalleryUrl(e.target.value)}
-                          placeholder="Enter Image Link..."
-                          className="flex-1 border border-gray-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-yellow-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (newGalleryUrl) {
-                              setSelectedProduct((prev) => ({
-                                ...prev,
-                                images: [...(prev.images || []), newGalleryUrl],
-                              }));
-                              setNewGalleryUrl("");
-                            }
-                          }}
-                          className="bg-gray-900 text-white px-8 rounded-xl font-bold"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="w-full h-20 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center bg-gray-50 hover:border-yellow-400 cursor-pointer transition">
-                        <UploadCloud size={20} className="text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-500 font-medium">
-                          Click to upload multiple images
-                        </span>
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleGalleryFiles}
-                        />
-                      </label>
-                    )}
-
-                    <div className="flex flex-wrap gap-3 mt-4">
-                      {selectedProduct.images?.map((img, idx) => (
-                        <div
-                          key={idx}
-                          className="relative group w-24 h-24 border border-gray-200 rounded-2xl overflow-hidden shadow-sm"
-                        >
-                          <img
-                            src={img}
-                            className="w-full h-full object-cover"
-                            alt=""
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedProduct((prev) => ({
-                                ...prev,
-                                images: prev.images.filter((_, i) => i !== idx),
-                              }))
-                            }
-                            className="absolute inset-0 bg-red-600/90 text-white opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Column 2: Inventory & Extra */}
-                <div className="space-y-6">
-                  <div className="bg-gray-900 text-white p-6 rounded-3xl space-y-4 shadow-xl">
-                    <h3 className="font-bold border-b border-gray-700 pb-2 text-yellow-400">
-                      Pricing & Stock
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-[10px] text-gray-400 uppercase font-bold">
-                          MRP (₹)
-                        </label>
-                        <input
-                          type="number"
-                          name="mrp"
-                          value={selectedProduct.mrp}
-                          onChange={handleEditChange}
-                          className="w-full bg-gray-800 rounded-lg p-2 mt-1 text-white border-none focus:ring-1 focus:ring-yellow-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-gray-400 uppercase font-bold">
-                          Disc (%)
-                        </label>
-                        <input
-                          type="number"
-                          name="discount"
-                          value={selectedProduct.discount}
-                          onChange={handleEditChange}
-                          className="w-full bg-gray-800 rounded-lg p-2 mt-1 text-white border-none focus:ring-1 focus:ring-yellow-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-xl">
-                      <p className="text-[10px] text-yellow-500 font-bold uppercase">
-                        Calculated Sale Price
-                      </p>
-                      <p className="text-2xl font-black text-yellow-500">
-                        ₹{selectedProduct.price}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-gray-400 uppercase font-bold">
-                        Current Stock
-                      </label>
-                      <input
-                        type="number"
-                        name="stock"
-                        value={selectedProduct.stock}
-                        onChange={handleEditChange}
-                        className="w-full bg-gray-800 rounded-lg p-2 mt-1 text-white border-none focus:ring-1 focus:ring-yellow-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="bg-white border p-6 border-gray-200 rounded-3xl space-y-4">
-                    <h3 className="font-bold text-gray-800 border-b border-gray-200 pb-2">
-                      Meta Info
-                    </h3>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500">
-                        Brand
-                      </label>
-                      <input
-                        name="publisher"
-                        value={selectedProduct.publisher || ""}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-500">
-                        Rating
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        name="rating"
-                        value={selectedProduct.rating ?? 0}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-500">
-                        Status
-                      </label>
-                      <select
-                        name="status"
-                        value={selectedProduct.status || "active"}
-                        onChange={handleEditChange}
-                        className="w-full border border-gray-200 rounded-xl p-2.5 mt-1"
-                      >
-                        <option value="active">Visible</option>
-                        <option value="inactive">Hidden</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4 mt-10">
-                <button
-                  type="button"
-                  onClick={() => setIsEditOpen(false)}
-                  className="flex-1 py-4 border rounded-2xl font-bold text-gray-500 hover:bg-gray-50 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-[2] py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl font-bold shadow-lg shadow-yellow-100 transition flex items-center justify-center gap-2"
-                >
-                  <Save size={20} /> Push Updates to Live Site
-                </button>
-              </div>
-            </form>
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            
+            <div className="flex gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-10 h-10 rounded-xl font-medium transition-all ${
+                      currentPage === pageNum
+                        ? "bg-[#E5B234] text-white"
+                        : "border border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
       )}
 
       {/* ================= MODAL: VIEW ONLY ================= */}
       {isViewOpen && selectedProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/50 flex h-[80vh] overflow-y-scroll items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl max-w-lg w-full p-8 relative shadow-2xl">
             <button
               onClick={() => setIsViewOpen(false)}
@@ -706,6 +329,28 @@ const ManageProducts = () => {
                   {selectedProduct.desc || "No description provided."}
                 </p>
               </div>
+              
+              {selectedProduct.descriptions && selectedProduct.descriptions.length > 0 && selectedProduct.descriptions.some(d => d.trim() !== "") && (
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800 mt-4">Additional Descriptions</h4>
+                  <div className="space-y-2">
+                    {selectedProduct.descriptions.filter(d => d.trim() !== "").map((desc, index) => (
+                      <p key={index} className="text-sm text-gray-500 italic">
+                        {desc}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedProduct.productCode && (
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800 mt-4">Product Code</h4>
+                  <p className="text-sm text-gray-500 italic">
+                    {selectedProduct.productCode}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

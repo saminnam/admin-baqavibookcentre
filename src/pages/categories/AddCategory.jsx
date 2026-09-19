@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../components/Api";
-
 import { ImageIcon, Link as LinkIcon, UploadCloud, X } from "lucide-react";
 
 const AddCategory = () => {
+  const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editCategoryId, setEditCategoryId] = useState(null);
+  
   const [formData, setFormData] = useState({ name: "", image: "" });
 
   // "upload" | "url"
@@ -17,6 +19,35 @@ const AddCategory = () => {
   const [imageUrl, setImageUrl] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check for edit mode data
+    const editCategoryData = localStorage.getItem('editCategoryData');
+    if (editCategoryData) {
+      try {
+        const category = JSON.parse(editCategoryData);
+        setFormData({
+          name: category.name || "",
+          image: category.image || "",
+        });
+        setEditCategoryId(category._id);
+        setIsEditMode(true);
+        
+        // Set image mode based on whether it's a URL
+        const isUrl = typeof category.image === "string" && category.image.startsWith("http");
+        setImageMode(isUrl ? "url" : "upload");
+        if (isUrl) {
+          setImageUrl(category.image);
+        }
+        
+        // Clear the localStorage after loading
+        localStorage.removeItem('editCategoryData');
+      } catch (error) {
+        console.error('Error parsing edit category data:', error);
+        toast.error('Error loading category data for editing');
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,12 +89,12 @@ const AddCategory = () => {
       return;
     }
 
-    if (imageMode === "upload" && !imageFile) {
+    if (imageMode === "upload" && !imageFile && !isEditMode) {
       toast.error("Category image file is required");
       return;
     }
 
-    if (imageMode === "url" && !imageUrl.trim()) {
+    if (imageMode === "url" && !imageUrl.trim() && !isEditMode) {
       toast.error("Category image URL is required");
       return;
     }
@@ -86,17 +117,32 @@ const AddCategory = () => {
         payload.append("image", "");
       }
 
-      await axios.post(`${API_BASE_URL}/categories`, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (isEditMode && editCategoryId) {
+        // Update existing category
+        await axios.put(`${API_BASE_URL}/categories/${editCategoryId}`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success("Category updated successfully");
+      } else {
+        // Create new category
+        await axios.post(`${API_BASE_URL}/categories`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success("Category added successfully");
+      }
 
-      toast.success("Category added successfully");
+      // Reset form and navigate back
       setFormData({ name: "", image: "" });
       setImageFile(null);
       setImageUrl("");
       setImageMode("upload");
+      setIsEditMode(false);
+      setEditCategoryId(null);
+      
+      // Navigate back to category list
+      navigate('/manage-categories');
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to add category");
+      toast.error(error.response?.data?.message || "Unable to save category");
     } finally {
       setLoading(false);
     }
@@ -191,13 +237,37 @@ const AddCategory = () => {
 
   return (
     <div className="p-6 min-h-screen text-slate-900 font-sans">
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold text-slate-900">Add Category</h1>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900">
+            {isEditMode ? "Edit Category" : "Add Category"}
+          </h1>
+        </div>
+        <div className="flex gap-3">
+          {isEditMode && (
+            <button
+              type="button"
+              onClick={() => navigate('/manage-categories')}
+              className="border border-slate-300 text-slate-700 px-6 py-2.5 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            form="category-form"
+            type="submit"
+            disabled={loading}
+            className="rounded-xl bg-[#1E2939] px-5 py-2.5 font-semibold text-white transition hover:bg-[#090f17] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {loading ? "Saving..." : (isEditMode ? "Update" : "Save Category")}
+          </button>
+        </div>
       </div>
 
       <form
         onSubmit={handleSubmit}
         className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6"
+        id="category-form"
       >
         <div className="space-y-4">
           <div>
@@ -224,14 +294,6 @@ const AddCategory = () => {
             <span className="text-sm font-semibold text-gray-400">Image Dimension: 250x250</span>
           </div>
         </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-xl bg-[#1E2939] px-5 py-2.5 font-semibold text-white transition hover:bg-[#090f17] disabled:cursor-not-allowed disabled:opacity-70 w-full"
-        >
-          {loading ? "Saving..." : "Save Category"}
-        </button>
       </form>
     </div>
   );
