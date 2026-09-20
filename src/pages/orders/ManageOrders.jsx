@@ -9,9 +9,8 @@ import { API_BASE_URL } from "../../components/Api";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState({});
+  const [products, setProducts] = useState({}); // Fallback for non-populated data
   
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -83,7 +82,7 @@ const ManageOrders = () => {
 
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(); // Fetch as fallback for non-populated data
     fetchOrders();
   }, []);
 
@@ -222,12 +221,27 @@ const ManageOrders = () => {
                     <div className="bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden">
                       <div className="max-h-[250px] overflow-y-auto p-2">
                         {selectedOrder.products.map((p, idx) => {
-                          const product = products[p.productId];
+                          // Handle both populated and non-populated product data
+                          const product = p.productId && typeof p.productId === 'object' 
+                            ? p.productId 
+                            : products[p.productId];
+                          const productName = product?.name || "Unknown Product";
+                          const productImage = product?.image || null;
+                          
                           return (
                             <div key={idx} className="flex justify-between items-center p-3 border-b border-slate-200/50 last:border-0">
-                              <div>
-                                <p className="text-sm font-bold text-slate-800">{product?.name || "Unknown Product"}</p>
-                                <p className="text-[10px] font-black text-slate-700 uppercase">Qty: {p.quantity} × ₹{p.price}</p>
+                              <div className="flex items-center gap-3">
+                                {productImage && (
+                                  <img 
+                                    src={productImage} 
+                                    alt={productName}
+                                    className="w-12 h-12 object-cover rounded-lg"
+                                  />
+                                )}
+                                <div>
+                                  <p className="text-sm font-bold text-slate-800">{productName}</p>
+                                  <p className="text-[10px] font-black text-slate-700 uppercase">Qty: {p.quantity} × ₹{p.price}</p>
+                                </div>
                               </div>
                               <span className="font-black text-sm text-slate-700">₹{p.price * p.quantity}</span>
                             </div>
