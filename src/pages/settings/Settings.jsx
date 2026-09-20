@@ -73,14 +73,15 @@ const Settings = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "ml_default"); // You may need to configure this in Cloudinary
+      formData.append("folder", "company-logos");
 
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/yp2hs1u8/image/upload`,
-        formData
-      );
+      const response = await axios.post(`${API_BASE_URL}/company-info/upload-logo`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      const logoUrl = response.data.secure_url;
+      const logoUrl = response.data.url;
       setCompanyInfo({
         ...companyInfo,
         logo: logoUrl,
