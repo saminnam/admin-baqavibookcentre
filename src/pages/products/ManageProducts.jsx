@@ -137,7 +137,7 @@ const ManageProducts = () => {
               <tr>
                 <th className="p-4 text-xs uppercase font-bold">Product</th>
                 <th className="p-4 text-xs uppercase font-bold">Category</th>
-                <th className="p-4 text-xs uppercase font-bold">Product Code</th>
+                <th className="p-4 text-xs uppercase font-bold"> Code</th>
                 <th className="p-4 text-xs uppercase font-bold">Price</th>
                 <th className="p-4 text-xs uppercase font-bold">Stock</th>
                 <th className="p-4 text-xs uppercase font-bold text-center">
@@ -345,7 +345,7 @@ const ManageProducts = () => {
               
               {selectedProduct.productCode && (
                 <div>
-                  <h4 className="text-sm font-bold text-gray-800 mt-4">Code</h4>
+                  <h4 className="text-sm font-bold text-gray-800 mt-4">Product Code</h4>
                   <p className="text-sm text-gray-500 italic">
                     {selectedProduct.productCode}
                   </p>
