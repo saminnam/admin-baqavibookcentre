@@ -67,7 +67,7 @@ const InvoicePreview = ({ order, companyInfo, onClose, onSendInvoice }) => {
                 </div>
               </div>
               <div className="text-right">
-                <h2 className="text-4xl font-black text-[#E5B236] mb-2">INVOICE</h2>
+                <h2 className="text-4xl font-black text-[#fff] mb-2">INVOICE</h2>
                 <div className="space-y-1 text-slate-600 text-sm">
                   <p><strong>Invoice #:</strong> {orderId}</p>
                   <p><strong>Date:</strong> {orderDate}</p>
@@ -143,7 +143,7 @@ const InvoicePreview = ({ order, companyInfo, onClose, onSendInvoice }) => {
                   <span className="text-slate-600 text-sm">Tax:</span>
                   <span className="text-slate-800 font-bold">₹0</span>
                 </div>
-                <div className="bg-[#E5B236] text-white p-4 rounded-2xl mt-4">
+                <div className="bg-[#fff] text-black p-4 rounded-2xl mt-4">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">Total:</span>
                     <span className="text-2xl font-black">₹{order.totalAmount}</span>
