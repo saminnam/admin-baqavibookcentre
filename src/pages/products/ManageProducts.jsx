@@ -279,8 +279,8 @@ const ManageProducts = () => {
 
       {/* ================= MODAL: VIEW ONLY ================= */}
       {isViewOpen && selectedProduct && (
-        <div className="fixed inset-0 bg-black/50 flex h-[80vh] overflow-y-scroll items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8 relative shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 relative shadow-2xl h-[80vh] overflow-y-scroll">
             <button
               onClick={() => setIsViewOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-black"
