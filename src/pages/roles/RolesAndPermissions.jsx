@@ -45,6 +45,9 @@ const availablePermissions = [
 
   // Website Users
   { id: "website-users", label: "Website Users" },
+
+  // Settings
+  { id: "settings", label: "Company Settings" },
 ];
 
 const RolesAndPermissions = () => {

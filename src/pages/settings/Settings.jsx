@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Building2, Mail, Phone, MapPin, Globe, Save, Loader2 } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Globe, Save, Loader2, Upload, X } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const Settings = () => {
@@ -20,10 +20,18 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     fetchCompanyInfo();
   }, []);
+
+  useEffect(() => {
+    if (companyInfo.logo) {
+      setLogoPreview(companyInfo.logo);
+    }
+  }, [companyInfo.logo]);
 
   const fetchCompanyInfo = async () => {
     try {
@@ -41,6 +49,59 @@ const Settings = () => {
       ...companyInfo,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.match(/image.*/)) {
+      setMessage("Please select an image file");
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("File size must be less than 5MB");
+      return;
+    }
+
+    setUploadingLogo(true);
+    setMessage("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "ml_default"); // You may need to configure this in Cloudinary
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/yp2hs1u8/image/upload`,
+        formData
+      );
+
+      const logoUrl = response.data.secure_url;
+      setCompanyInfo({
+        ...companyInfo,
+        logo: logoUrl,
+      });
+      setLogoPreview(logoUrl);
+      setMessage("Logo uploaded successfully!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      setMessage("Failed to upload logo");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setCompanyInfo({
+      ...companyInfo,
+      logo: "",
+    });
+    setLogoPreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -93,6 +154,58 @@ const Settings = () => {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Company Logo */}
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-black uppercase text-slate-700 tracking-wider">Company Logo</label>
+            <div className="flex items-center gap-4">
+              {logoPreview ? (
+                <div className="relative">
+                  <img
+                    src={logoPreview}
+                    alt="Company Logo"
+                    className="w-24 h-24 object-contain rounded-xl border border-slate-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveLogo}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50">
+                  <Building2 size={32} className="text-slate-400" />
+                </div>
+              )}
+              <div className="flex-1">
+                <input
+                  type="file"
+                  id="logo-upload"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  disabled={uploadingLogo}
+                />
+                <label
+                  htmlFor="logo-upload"
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold cursor-pointer transition ${
+                    uploadingLogo
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-[#E5B236] text-white hover:bg-[#d4a12f]"
+                  }`}
+                >
+                  {uploadingLogo ? (
+                    <><Loader2 size={16} className="animate-spin" /> Uploading...</>
+                  ) : (
+                    <><Upload size={16} /> Upload Logo</>
+                  )}
+                </label>
+                <p className="text-xs text-slate-500 mt-2">Recommended: Square image, max 5MB</p>
+              </div>
+            </div>
+          </div>
+
           {/* Company Name */}
           <div className="space-y-2">
             <label className="text-xs font-black uppercase text-slate-700 tracking-wider">Company Name *</label>

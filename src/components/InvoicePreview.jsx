@@ -45,16 +45,25 @@ const InvoicePreview = ({ order, companyInfo, onClose, onSendInvoice }) => {
           <div className="bg-white rounded-2xl shadow-sm p-8">
             {/* Header Section */}
             <div className="flex justify-between items-start mb-8 pb-6 border-b-2 border-[#E5B236]">
-              <div className="flex-1">
-                <h1 className="text-3xl font-black text-slate-800 mb-2">{companyInfo.companyName}</h1>
-                <div className="space-y-1 text-slate-600 text-sm">
-                  <p>{companyInfo.address}</p>
-                  <p>{companyInfo.city}, {companyInfo.state} {companyInfo.postalCode}</p>
-                  <p>{companyInfo.country}</p>
-                  <p><strong>Email:</strong> {companyInfo.email}</p>
-                  <p><strong>Phone:</strong> {companyInfo.phone}</p>
-                  {companyInfo.website && <p><strong>Website:</strong> {companyInfo.website}</p>}
-                  {companyInfo.taxId && <p><strong>Tax ID:</strong> {companyInfo.taxId}</p>}
+              <div className="flex items-start gap-6">
+                {companyInfo.logo && (
+                  <img
+                    src={companyInfo.logo}
+                    alt="Company Logo"
+                    className="w-20 h-20 object-contain"
+                  />
+                )}
+                <div className="flex-1">
+                  <h1 className="text-3xl font-black text-slate-800 mb-2">{companyInfo.companyName}</h1>
+                  <div className="space-y-1 text-slate-600 text-sm">
+                    <p>{companyInfo.address}</p>
+                    <p>{companyInfo.city}, {companyInfo.state} {companyInfo.postalCode}</p>
+                    <p>{companyInfo.country}</p>
+                    <p><strong>Email:</strong> {companyInfo.email}</p>
+                    <p><strong>Phone:</strong> {companyInfo.phone}</p>
+                    {companyInfo.website && <p><strong>Website:</strong> {companyInfo.website}</p>}
+                    {companyInfo.taxId && <p><strong>Tax ID:</strong> {companyInfo.taxId}</p>}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
