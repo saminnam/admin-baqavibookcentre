@@ -345,7 +345,7 @@ const ManageProducts = () => {
               
               {selectedProduct.productCode && (
                 <div>
-                  <h4 className="text-sm font-bold text-gray-800 mt-4">Product Code</h4>
+                  <h4 className="text-sm font-bold text-gray-800 mt-4">Code</h4>
                   <p className="text-sm text-gray-500 italic">
                     {selectedProduct.productCode}
                   </p>
