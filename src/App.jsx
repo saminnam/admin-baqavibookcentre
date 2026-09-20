@@ -23,6 +23,7 @@ import ManageOfferHeroSlides from "./pages/offer-hero-slides/ManageOfferHeroSlid
 import AddCategory from "./pages/categories/AddCategory";
 import ManageCategories from "./pages/categories/ManageCategories";
 import NotificationsPage from "./pages/notifications/NotificationsPage";
+import Settings from "./pages/settings/Settings";
 import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
@@ -227,6 +228,16 @@ const App = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <ManageOfferHeroSlides />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Settings />
               </DashboardLayout>
             </ProtectedRoute>
           }

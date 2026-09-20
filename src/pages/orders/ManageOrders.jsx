@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  Package, Search, Eye, Trash2, CheckCircle, Truck, Clock, X, Mail, MapPin, Phone, User, Ban
+  Package, Search, Eye, Trash2, CheckCircle, Truck, Clock, X, Mail, MapPin, Phone, User, Ban, Send
 } from "lucide-react";
 
 import { API_BASE_URL } from "../../components/Api";
+import InvoicePreview from "../../components/InvoicePreview";
 
 
 const ManageOrders = () => {
@@ -15,6 +16,10 @@ const ManageOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingOrder, setDeletingOrder] = useState(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState(null);
+  const [showInvoiceConfirm, setShowInvoiceConfirm] = useState(false);
+  const [confirmingOrder, setConfirmingOrder] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -27,6 +32,15 @@ const ManageOrders = () => {
       setProducts(productMap);
     } catch (error) {
       console.error("Failed to fetch products:", error);
+    }
+  };
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/company-info`);
+      setCompanyInfo(res.data);
+    } catch (error) {
+      console.error("Failed to fetch company info:", error);
     }
   };
 
@@ -67,10 +81,11 @@ const ManageOrders = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`${API_BASE_URL}/orders/status/${id}`, {
+      const res = await axios.patch(`${API_BASE_URL}/orders/status/${id}`, {
         status: newStatus,
       });
       fetchOrders();
+      
       if (selectedOrder) setSelectedOrder(null);
       alert(`Order updated to ${newStatus} and email notification sent!`);
     } catch (error) {
@@ -78,12 +93,55 @@ const ManageOrders = () => {
       alert("Status update failed");
     }
 
+  };
+
+  const handleConfirmOrder = (order) => {
+    setConfirmingOrder(order);
+    setShowInvoiceConfirm(true);
+  };
+
+  const confirmOrderWithInvoice = async (sendInvoice) => {
+    if (!confirmingOrder) return;
+
+    try {
+      const res = await axios.patch(`${API_BASE_URL}/orders/status/${confirmingOrder._id}`, {
+        status: "Confirmed",
+      });
+      fetchOrders();
+      
+      const updatedOrder = res.data;
+      setSelectedOrder(updatedOrder);
+      
+      if (sendInvoice) {
+        setShowInvoice(true);
+      }
+      
+      setShowInvoiceConfirm(false);
+      setConfirmingOrder(null);
+    } catch (error) {
+      console.error(error);
+      alert("Status update failed");
+    }
+  };
+
+  const sendInvoiceEmail = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      await axios.post(`${API_BASE_URL}/invoice/send/${selectedOrder._id}`);
+      setShowInvoice(false);
+      alert("Invoice sent successfully to customer!");
+    } catch (error) {
+      console.error("Failed to send invoice:", error);
+      alert("Failed to send invoice");
+    }
   }; 
 
 
   useEffect(() => {
     fetchProducts(); // Fetch as fallback for non-populated data
     fetchOrders();
+    fetchCompanyInfo();
   }, []);
 
   const filteredOrders = orders.filter(
@@ -137,7 +195,7 @@ const ManageOrders = () => {
             {filteredOrders.map((order) => (
               <tr key={order._id} className="hover:bg-slate-50/50 transition-all">
                 <td className="px-6 py-4 text-sm font-bold text-slate-600">
-                  #{order._id.slice(-6).toUpperCase()}
+                  #{String(order._id).slice(-6).toUpperCase()}
                   <div className="text-[10px] font-normal text-slate-700">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </div>
@@ -185,7 +243,7 @@ const ManageOrders = () => {
             <div className="p-8 border-b border-slate-200 flex justify-between items-center bg-white">
               <div>
                 <h2 className="font-black text-2xl text-slate-800 uppercase tracking-tight">Order Details</h2>
-                <p className="text-slate-700 text-xs font-bold uppercase tracking-widest mt-1">ID: #{selectedOrder._id}</p>
+                <p className="text-slate-700 text-xs font-bold uppercase tracking-widest mt-1">ID: #{String(selectedOrder._id).slice(-6).toUpperCase()}</p>
               </div>
               <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-slate-100 rounded-full transition-all">
                 <X size={24} className="text-slate-700" />
@@ -259,9 +317,15 @@ const ManageOrders = () => {
 
             {/* ACTION FOOTER - Integrated New Buttons */}
             <div className="p-8 bg-white border-t border-slate-200 flex flex-wrap gap-3 justify-center">
-              <ActionButton label="Confirm Order" color="indigo" icon={<CheckCircle size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Confirmed")} />
+              <ActionButton label="Confirm Order" color="indigo" icon={<CheckCircle size={14}/>} onClick={() => handleConfirmOrder(selectedOrder)} />
               <ActionButton label="Ship Order" color="blue" icon={<Truck size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Shipped")} />
               <ActionButton label="Mark Delivered" color="green" icon={<CheckCircle size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Delivered")} />
+              <ActionButton 
+                label="Send Invoice" 
+                color="amber" 
+                icon={<Mail size={14}/>} 
+                onClick={() => setShowInvoice(true)} 
+              />
               <div className="w-full flex justify-center gap-3 mt-2 border-t border-slate-200 pt-4">
                 <ActionButton label="Back to Pending" color="amber" icon={<Clock size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Pending")} />
                 <ActionButton label="Cancel Order" color="red" icon={<Ban size={14}/>} onClick={() => updateStatus(selectedOrder._id, "Cancelled")} />
@@ -291,7 +355,7 @@ const ManageOrders = () => {
 
             <div className="p-6 space-y-4">
               <p className="text-slate-600">
-                Are you sure you want to delete order <span className="font-semibold text-slate-900">#{deletingOrder._id.slice(-6).toUpperCase()}</span>? This action cannot be undone.
+                Are you sure you want to delete order <span className="font-semibold text-slate-900">#{String(deletingOrder._id).slice(-6).toUpperCase()}</span>? This action cannot be undone.
               </p>
 
               <div className="flex gap-3 pt-2">
@@ -300,6 +364,59 @@ const ManageOrders = () => {
                 </button>
                 <button onClick={deleteOrder} className="flex-[2] py-3 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 transition shadow-lg">
                   Delete Order
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice Preview Modal */}
+      {showInvoice && selectedOrder && companyInfo && (
+        <InvoicePreview
+          order={selectedOrder}
+          companyInfo={companyInfo}
+          onClose={() => setShowInvoice(false)}
+          onSendInvoice={sendInvoiceEmail}
+        />
+      )}
+
+      {/* Invoice Confirmation Dialog */}
+      {showInvoiceConfirm && confirmingOrder && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#E5B236] text-white rounded-xl p-2">
+                  <Mail size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Send Invoice</h2>
+                  <p className="text-xs text-slate-500 uppercase font-bold tracking-widest">Order #{String(confirmingOrder._id).slice(-6).toUpperCase()}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowInvoiceConfirm(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600">
+                Do you want to send the invoice to <span className="font-semibold text-slate-900">{confirmingOrder.customer.email}</span> after confirming this order?
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => confirmOrderWithInvoice(false)}
+                  className="flex-1 py-3 border rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  Confirm Only
+                </button>
+                <button 
+                  onClick={() => confirmOrderWithInvoice(true)}
+                  className="flex-[2] py-3 bg-[#E5B236] text-white rounded-2xl font-bold hover:bg-[#d4a12f] transition shadow-lg"
+                >
+                  Confirm & Send Invoice
                 </button>
               </div>
             </div>

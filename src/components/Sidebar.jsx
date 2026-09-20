@@ -13,7 +13,8 @@ import {
   Globe,
   Tag,
   ShoppingBasket,
-  UserKey
+  UserKey,
+  Settings
 } from "lucide-react";
 import logo from "../assets/logos/logo-bg.png";
 
@@ -139,6 +140,18 @@ const navItems = [
     children: [],
     link: "/website-users",
     permission: "website-users",
+  },
+  {
+    icon: <Settings className="text-2xl text-gray-600 dark:text-gray-400" />,
+    label: "Settings",
+    children: [
+      {
+        label: "Company Settings",
+        link: "/settings",
+        permission: "settings",
+      },
+    ],
+    permission: "settings",
   },
 ];
 
