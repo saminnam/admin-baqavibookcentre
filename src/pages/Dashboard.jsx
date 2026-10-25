@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNotification } from "../context/NotificationContext";
-import { 
-  ShoppingCart, Package, Users, DollarSign, TrendingUp, 
+import {
+  ShoppingCart, Package, Users, DollarSign, TrendingUp,
   MessageSquare, Store, Calendar, ArrowUpRight, ArrowDownRight,
-  RefreshCw, Loader2, Activity, CreditCard, UserCog, Globe, Bell, X
+  RefreshCw, Loader2, Activity, CreditCard, UserCog, Globe, Bell, X, Layers
 } from "lucide-react";
 import { Line } from "react-chartjs-2";
 import {
@@ -37,6 +37,7 @@ const Dashboard = () => {
     totalWebsiteUsers: 0,
     totalAdminUsers: 0,
     totalSellers: 0,
+    totalCategories: 0,
     totalRevenue: 0,
     todayRevenue: 0,
     pendingEnquiries: 0
@@ -54,23 +55,27 @@ const Dashboard = () => {
       // Fetch products
       const productsRes = await axios.get(`${API_BASE_URL}/products`);
       const products = productsRes.data?.products || [];
-      
+
       // Fetch orders
       const ordersRes = await axios.get(`${API_BASE_URL}/orders`);
       const orders = ordersRes.data || [];
-      
+
       // Fetch sellers
       const sellersRes = await axios.get(`${API_BASE_URL}/seller`);
       const sellers = sellersRes.data || [];
-      
+
+      // Fetch categories
+      const categoriesRes = await axios.get(`${API_BASE_URL}/categories`);
+      const categories = categoriesRes.data?.categories || categoriesRes.data || [];
+
       // Fetch enquiries
       const enquiriesRes = await axios.get(`${API_BASE_URL}/contact/enquiries`);
       const enquiries = enquiriesRes.data || [];
-      
+
       // Fetch website users
       const websiteUsersRes = await axios.get(`${API_BASE_URL}/auth/users`);
       const websiteUsers = websiteUsersRes.data || [];
-      
+
       // Fetch admin users
       const adminUsersRes = await axios.get(`${API_BASE_URL}/admin-users`);
       const adminUsers = adminUsersRes.data || [];
@@ -94,6 +99,7 @@ const Dashboard = () => {
         totalWebsiteUsers: websiteUsers.length,
         totalAdminUsers: adminUsers.length,
         totalSellers: sellers.length,
+        totalCategories: Array.isArray(categories) ? categories.length : 0,
         totalRevenue: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0),
         todayRevenue,
         pendingEnquiries: enquiries.filter(e => !e.verified).length
@@ -290,17 +296,25 @@ const Dashboard = () => {
           // trend="up"
           // trendValue="2%"
         />
-        <StatCard 
-          title="Sellers" 
-          value={stats.totalSellers} 
+        <StatCard
+          title="Sellers"
+          value={stats.totalSellers}
           icon={<Store size={24} className="text-white" />}
           color="bg-gradient-to-br from-orange-500 to-orange-600"
           // trend="up"
           // trendValue="3%"
         />
-        <StatCard 
-          title="Revenue" 
-          value={`₹${stats.totalRevenue.toLocaleString()}`} 
+        <StatCard
+          title="Categories"
+          value={stats.totalCategories}
+          icon={<Layers size={24} className="text-white" />}
+          color="bg-gradient-to-br from-teal-500 to-teal-600"
+          // trend="up"
+          // trendValue="4%"
+        />
+        <StatCard
+          title="Revenue"
+          value={`₹${stats.totalRevenue.toLocaleString()}`}
           icon={<DollarSign size={24} className="text-white" />}
           color="bg-gradient-to-br from-[#E5B236] to-[#d4a32e]"
           // trend="up"
