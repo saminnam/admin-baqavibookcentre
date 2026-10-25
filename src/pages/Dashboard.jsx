@@ -263,56 +263,56 @@ const Dashboard = () => {
           value={stats.totalOrders} 
           icon={<ShoppingCart size={24} className="text-white" />}
           color="bg-gradient-to-br from-blue-500 to-blue-600"
-          trend="up"
-          trendValue="12%"
+          // trend="up"
+          // trendValue="12%"
         />
         <StatCard 
           title="Products" 
           value={stats.totalProducts} 
           icon={<Package size={24} className="text-white" />}
           color="bg-gradient-to-br from-purple-500 to-purple-600"
-          trend="up"
-          trendValue="8%"
+          // trend="up"
+          // trendValue="8%"
         />
         <StatCard 
           title="Website Users" 
           value={stats.totalWebsiteUsers} 
           icon={<Globe size={24} className="text-white" />}
           color="bg-gradient-to-br from-cyan-500 to-cyan-600"
-          trend="up"
-          trendValue="5%"
+          // trend="up"
+          // trendValue="5%"
         />
         <StatCard 
           title="Admin Users" 
           value={stats.totalAdminUsers} 
           icon={<UserCog size={24} className="text-white" />}
           color="bg-gradient-to-br from-indigo-500 to-indigo-600"
-          trend="up"
-          trendValue="2%"
+          // trend="up"
+          // trendValue="2%"
         />
         <StatCard 
           title="Sellers" 
           value={stats.totalSellers} 
           icon={<Store size={24} className="text-white" />}
           color="bg-gradient-to-br from-orange-500 to-orange-600"
-          trend="up"
-          trendValue="3%"
+          // trend="up"
+          // trendValue="3%"
         />
         <StatCard 
           title="Revenue" 
           value={`₹${stats.totalRevenue.toLocaleString()}`} 
           icon={<DollarSign size={24} className="text-white" />}
           color="bg-gradient-to-br from-[#E5B236] to-[#d4a32e]"
-          trend="up"
-          trendValue="15%"
+          // trend="up"
+          // trendValue="15%"
         />
         <StatCard 
           title="Pending Enquiries" 
           value={stats.pendingEnquiries} 
           icon={<MessageSquare size={24} className="text-white" />}
           color="bg-gradient-to-br from-red-500 to-red-600"
-          trend="down"
-          trendValue="2%"
+          // trend="down"
+          // trendValue="2%"
         />
       </div>
 
