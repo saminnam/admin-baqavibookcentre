@@ -2,19 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Pencil, X, ChevronLeft, ChevronRight, Search, GripVertical } from "lucide-react";
+import { Trash2, Pencil, X, Search, GripVertical } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const ManageCategories = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCategories, setTotalCategories] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [draggedItem, setDraggedItem] = useState(null);
-  const itemsPerPage = 10;
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState(null);
@@ -42,39 +38,26 @@ const ManageCategories = () => {
     return `${baseUrl}/uploads/${normalized}`;
   };
 
-  const fetchCategories = async (page = 1) => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_BASE_URL}/categories?page=${page}&limit=${itemsPerPage}`);
+      const res = await axios.get(`${API_BASE_URL}/categories`);
       console.log("API Response:", res.data);
 
       const categoriesData = res.data.categories || res.data;
       setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-
-      if (res.data.pagination) {
-        setTotalPages(res.data.pagination.pages);
-        setTotalCategories(res.data.pagination.total);
-        setCurrentPage(res.data.pagination.current);
-      } else {
-        // Fallback if pagination data is not returned
-        setTotalPages(1);
-        setTotalCategories(Array.isArray(categoriesData) ? categoriesData.length : 0);
-        setCurrentPage(1);
-      }
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Unable to load categories");
       setCategories([]);
-      setTotalPages(1);
-      setTotalCategories(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories(currentPage);
-  }, [currentPage]);
+    fetchCategories();
+  }, []);
 
   const openDelete = (category) => {
     setDeletingCategory(category);
@@ -93,7 +76,7 @@ const ManageCategories = () => {
       await axios.delete(`${API_BASE_URL}/categories/${deletingCategory._id}`);
       toast.success("Category removed");
       closeDelete();
-      fetchCategories(currentPage);
+      fetchCategories();
     } catch {
       toast.error("Unable to delete category");
     }
@@ -130,22 +113,24 @@ const ManageCategories = () => {
 
     // Update order values
     const updatedCategories = newCategories.map((cat, index) => ({
-      ...cat,
+      _id: cat._id,
       order: index,
     }));
 
-    setCategories(updatedCategories);
+    setCategories(newCategories);
     setDraggedItem(null);
 
     // Save new order to backend
     try {
-      await axios.put(`${API_BASE_URL}/categories/reorder`, {
+      console.log("Sending reorder data:", { categories: updatedCategories });
+      const response = await axios.put(`${API_BASE_URL}/categories/reorder`, {
         categories: updatedCategories,
       });
+      console.log("Reorder response:", response.data);
       toast.success("Category order updated successfully");
     } catch (error) {
       console.error("Error updating order:", error);
-      toast.error("Failed to update category order");
+      toast.error(`Failed to update category order: ${error.response?.data?.message || error.message}`);
       // Revert on error
       setCategories(categories);
     }
@@ -236,66 +221,6 @@ const ManageCategories = () => {
           </div>
         )}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
-          <div className="text-sm text-gray-600">
-            {searchTerm
-              ? `Showing ${filteredCategories.length} filtered results`
-              : `Showing ${((currentPage - 1) * itemsPerPage) + 1} to ${Math.min(currentPage * itemsPerPage, totalCategories)} of ${totalCategories} categories`
-            }
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={16} />
-              Previous
-            </button>
-
-            <div className="flex gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`w-10 h-10 rounded-xl font-medium transition-all ${
-                      currentPage === pageNum
-                        ? "bg-[#E5B234] text-white"
-                        : "border border-gray-200 hover:bg-gray-50"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      )}
 
       {isDeleteOpen && deletingCategory && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
