@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Pencil, X, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Trash2, Pencil, X, ChevronLeft, ChevronRight, Search, GripVertical } from "lucide-react";
 import { API_BASE_URL } from "../../components/Api";
 
 const ManageCategories = () => {
@@ -13,6 +13,7 @@ const ManageCategories = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCategories, setTotalCategories] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [draggedItem, setDraggedItem] = useState(null);
   const itemsPerPage = 10;
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -104,6 +105,52 @@ const ManageCategories = () => {
     navigate('/add-category');
   };
 
+  const handleDragStart = (e, index) => {
+    setDraggedItem(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e, dropIndex) => {
+    e.preventDefault();
+
+    if (draggedItem === null || draggedItem === dropIndex) return;
+
+    const newCategories = [...categories];
+    const draggedCategory = newCategories[draggedItem];
+
+    // Remove from old position
+    newCategories.splice(draggedItem, 1);
+    // Insert at new position
+    newCategories.splice(dropIndex, 0, draggedCategory);
+
+    // Update order values
+    const updatedCategories = newCategories.map((cat, index) => ({
+      ...cat,
+      order: index,
+    }));
+
+    setCategories(updatedCategories);
+    setDraggedItem(null);
+
+    // Save new order to backend
+    try {
+      await axios.put(`${API_BASE_URL}/categories/reorder`, {
+        categories: updatedCategories,
+      });
+      toast.success("Category order updated successfully");
+    } catch (error) {
+      console.error("Error updating order:", error);
+      toast.error("Failed to update category order");
+      // Revert on error
+      setCategories(categories);
+    }
+  };
+
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -139,12 +186,21 @@ const ManageCategories = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredCategories.map((category) => (
+            {filteredCategories.map((category, index) => (
               <div
                 key={category._id}
-                className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
+                draggable={!searchTerm}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                className={`flex items-center justify-between rounded-xl border border-slate-200 p-4 transition-all ${
+                  !searchTerm ? "cursor-move hover:bg-slate-50" : ""
+                } ${draggedItem === index ? "opacity-50" : ""}`}
               >
                 <div className="flex items-center gap-3">
+                  {!searchTerm && (
+                    <GripVertical size={20} className="text-gray-400" />
+                  )}
                   {category.image ? (
                     <img
                       src={getCategoryImageUrl(category.image)}
